@@ -2,43 +2,40 @@ import random
 
 
 
-class Player:
+class RPGGame:
     def __init__(self):
-        self.name = ""
-        self.hp = 100
-        self.exp = 0
-        self.level = 1
-        self.inventory = []
-    
-    def attack(self):
-        return random.randint(1, 10)
-    
-    def use_item(self, item):
-        if item == "Health potion":
-            self.hp = min(self.hp + 20, 100)
-            self.inventory.remove(item)
+        self.player = Player()
 
-class Enemy:
-    def __init__(self, name, hp):
-        self.name = name
-        self.hp = hp
+        self.locations = {
+            "Wioska": Village(),
+            "Las": Forest(),
+            "Zamek": Castle()
+        }
 
-    def attack(self):
-        return random.randint(1, 10)
+        self.current_location = self.locations["Wioska"]
+
+        def explore(self):
+            message, found_intem = self.current_location.explore()
+
+            if found_intem:
+                self.player.inventory.append(found_intem)
+
+        def fight(self):
+            if not self.current_location.enemies:
+                print("Walka", "Brak przeciwników w tej lokacji.")
+                return
+            
+            enemy_name = random.choice(self.current_location.enemies)
+            enemy = Enemy(enemy_name, 30)
+
+            
+            
 
 
 
-class Location:
-    def __init__(self, name, description, enemies=None, items=None):
-        self.name = name
-        self.description = description
-        self.enemies = enemies or []
-        self.items = items or []
 
-    def explore(self):
-        if self.items:
-            found_item = self.items.pop()
-            return f'Znalazłeś {found_item}!', found_item
-        else:
-            return f'Nic nie znalazłeś', None
+
+
+
+        
 
