@@ -2,14 +2,24 @@ import random
 
 class Player:
     def __init__(self):
-        self.name = ""
+        self.name = "Gracz"
         self.hp = 100
-        self.exp = 0
-        self.level = 1
         self.inventory = []
+        self.attack_bonus = 0
     
     def attack(self):
-        return random.randint(1, 10)
+        return random.randint(1, 10) + self.attack_bonus
+    
+    def take_damage(self, damage):
+        self.hp -= damage
+        if self.hp < 0:
+            self.hp = 0
+
+    def heal(self, amount):
+        self.hp += amount
+        if self.hp > 100:
+            self.hp = 100
+
     
     def use_item(self, item):
         if item == "Health potion":
@@ -17,10 +27,15 @@ class Player:
             self.inventory.remove(item)
 
     
-    class Enemy:
+class Enemy:
     def __init__(self, name, hp):
         self.name = name
         self.hp = hp
+
+    def take_damage(self, damage):
+        self.hp -= damage
+        if self.hp < 0:
+            self.hp = 0
 
     def attack(self):
         return random.randint(1, 10)
