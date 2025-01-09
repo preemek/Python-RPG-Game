@@ -1,36 +1,12 @@
 import tkinter 
 import random
-class Player:
-    def __init__(self, name):
-        self.name = name
-        self.health = 100
-        self.exp = 0
-        self.level = 1
-        self.inventory = []
-    def level_up(self):
-        if self.exp >= 100:
-            self.level += 1
-            self.exp -= 100
-            self.health = 100
-    def take_damage(self, damage):
-        self.health -= damage
-        if self.health < 0:
-            self.health = 0
-class Enemy:
-    def __init__(self, name, health):
-        self.name = name
-        self.health = health
-    def take_damage(self, damage):
-        self.health -= damage
-        if self.health < 0:
-            self.health = 0
-
+from player import Player
+from enemy import Enemy
 class RPGGame:
     def __init__(self, root):
         self.root = root
         self.root.title("Tekstowa Gra RPG")
-        player_name = input("Podaj swoje imię!")
-        self.player = Player(player_name)
+        self.player = None
         self.enemy = None
         self.create_widgets()
 
@@ -51,14 +27,13 @@ class RPGGame:
         self.inventory_button = tkinter.Button(self.root, text="Ekwipunek", command=self.show_inventory, state=tkinter.DISABLED)
         self.inventory_button.pack(side=tkinter.LEFT, padx=5)
     def start_game(self):
-        self.player_name = self.entry.get()
-        if self.player_name:
-            self.log(f"Czesc, {self.player_name}! Witamy w grze.")
-            self.entry.pack_forget()
-            self.start_button.pack_forget()
-            self.enable_actions()
+        name = self.entry.get().strip()
+        if name:  
+           self.player = Player(name)  
+           self.log(f"Witaj, {self.player.name}! Twoja przygoda się zaczyna.") 
+           self.enable_actions()
         else:
-            self.log("Podaj swoje imię!")
+           self.log("Podaj swoje imię!") 
     def enable_actions(self):
         self.explore_button["state"] = tkinter.NORMAL
         self.fight_button["state"] = tkinter.NORMAL
@@ -115,10 +90,7 @@ class RPGGame:
         self.text_area["state"] = tkinter.DISABLED
         self.text_area.see(tkinter.END)
 
-if __name__ == "__main__":
-    root = tkinter.Tk()
-    game = RPGGame(root)
-    root.mainloop()
+
 
 
 
