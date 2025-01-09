@@ -1,22 +1,5 @@
-#Dm1tro07
-
-import random as r
-
-hp=0
-coins=0
-damage=0
-
-def printParametrs():
-    print ("U ciebie {0} HP, {1} coins i {2}damage.".format(hp,coins,damage))
-
-def printHP():
-    print("U ciebie", HP, "HP.")
-def printDamage():
-    print("U ciebie", damage, "damage.")
-def printCoins():
-    print("U ciebie", coins, "dollars.")
-
-def Shop():
+class shop:
+    def Shop():
     global hp
     global coins
     global damage
@@ -49,55 +32,13 @@ while input("What will you do,(come in/come out?)").lower()== "come in":
         if buy(OneHpDollars):
             HP +=1
             printHP()
-    elif choice == "2":
+    elif Choice == "2":
         if buy (ThreeHpDollars):
             HP +=3
             printHP()
-    elif choice == "3":
+    elif Choice == "3":
         if buy (weaponDollars):
             damage= weaponDamage
             printDamage()
     else:
         print("Nie spredaję tego")
-
-
-    
-    
-  
-
-
-
-
-
-
-def initGame(initHP,initCoins,initDamage):
-    global hp
-    global coins
-    global damage
-    hp=initHP
-    coins=initCoins
-    damage=initDamage
-    print("Wyruszyłeś na prygodę.Dobrych przygod!")
-    printParametrs()
-
-def gameLoop():
-    situation= r.randint(0,10)
-    if situation == 0:
-        Shop()
-        input("Shop")
-    elif situation == 1:
-        input("monster")
-    else:
-        input("Wandering...")
-
-initGame (3,5,1)
-while True:
-    gameLoop()
-    if hp <=0:
-        if input ("Want to start again(Yes/No):").lower() =="Yes":
-            initGame(3,5,1)
-    else:
-        break 
-
-
-
