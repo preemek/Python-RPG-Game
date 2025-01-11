@@ -46,6 +46,27 @@ class Player:
         if used_item["type"] == "weapon":
             self.Equiped_Weapon=used_item
 
+def create_player (mode:str,file_number):
+    """mode= <from_save_file> or <new_player>"""
+
+    path=f"Python-RPG-Game\Player_Save_File{file_number}.json"
+    if mode == "from_save_file":
+        with open(path,'r') as player_save: 
+            player_data = json.load(player_save)
+            player = Player(player_data["name"],player_data["HP"],player_data["Base_Dmg"],player_data["Equiped_Weapon"],player_data["Items"],player_data["Lvl"],player_data["XP"],player_data["XP_needed_to_lvl_up"])
+            player_save.close
+        return player
+    elif mode == "new_player":
+        #zrób entry box dla imienia gracza, sprawdź czy nazwa nie jest za długa
+        name="Bartek"
+        player=Player(name)
+        return player
+
+def save_player_data(player:Player,file_number):
+    path=f"Python-RPG-Game\Player_Save_File{file_number}.json"
+    with open(path,'w') as save_file:
+        json.dump(player.__dict__,save_file)
+        save_file.close
 
 class Enemy:
     def __init__ (self,name :str, base_dmg :int, hp:int, XP_on_death:int):

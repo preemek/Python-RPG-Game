@@ -1,15 +1,18 @@
 #Wiktor
 from Classes import *
-
+import json
 from tkinter import *
 import random
 
 
 
-if __name__ == "_main__":
-    pass
+# class rpg_game:
+#     Player1 = create_player()
 
+player1 = create_player(mode="from_save_file",file_number=1)
 
+print(player1.name)
+# save_player_data(player1,1)
 
 
 """
