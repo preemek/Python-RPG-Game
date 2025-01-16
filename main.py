@@ -1,5 +1,5 @@
 #Wiktor
-from Classes import *
+from Player import *
 import json
 from tkinter import *
 import random
@@ -8,11 +8,15 @@ import random
 
 # class rpg_game:
 #     Player1 = create_player()
-
-player1 = create_player(mode="from_save_file",file_number=1)
+player1 = Player()
+player1.create_player(mode="new_player",file_number=2)
 
 print(player1.name)
-# save_player_data(player1,1)
+player1.save_player_data(2)
+
+
+
+
 
 
 """
