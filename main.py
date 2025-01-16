@@ -13,7 +13,8 @@ class RPG:
 
         #stats gracza
         self.player = {
-            "HP": 100,
+            "Hp": 100,
+            "Max_Hp": 100,
             "damage": 10,
             "inventory": []
         }
@@ -21,9 +22,9 @@ class RPG:
         
         #przeciwniki
         self.enemies = {
-            "wolf": {"name": "Wolf", "HP": 20, "damage": (5, 15)},
-            "bandit": {"name": "Bandit", "HP": 50, "damage": (10, 15)},
-            "dragon": {"name": "Dragon", "HP": 100, "damage": (15, 25)}
+            "wolf": {"name": "Wolf", "Hp": 20, "damage": (5, 15)},
+            "bandit": {"name": "Bandit", "Hp": 50, "damage": (10, 15)},
+            "dragon": {"name": "Dragon", "Hp": 100, "damage": (15, 25)}
         }
 
 
@@ -44,15 +45,47 @@ class RPG:
             }
         }
 
-        #Aktualna lok.
-        self.current_location = "village"
+        current_location = None
+
+        #Aktualna lok i start gry.
+        def start_game():
+            global current_location
+            current_location = "village"
+            update_location()
+         
+        #Update statystyk i loc
+        def update_location():
+            location_label.config(text=f"Location: {current_location}")
+            description_label.config(text=locations[current_location])
+            update_stats()
+
+        def update_stats():
+            stats_label.config(
+                text=f"HP: {player['Hp']}/{player['Max_Hp']}"
+            )
+       
+        #Przycisk akcji
+        actions_frame = tk.Frame(root)
+        actions_frame.pack()
+
+        fight_button = tk.Button(actions_frame, text="Fight", command=fight)
+        fight_button.pack(side=tk.LEFT)
+
+        explore_button = tk.Button(actions_frame, text="Exploration", command=explore)
+        explore_button.pack(side=tk.LEFT)
+
+        use_item_button = tk.Button(actions_frame, text="Use an item", command=use_item)
+        use_item_button.pack(side=tk.LEFT)
+
 
         #tekst
         self.story_label = tk.Label(root, text="", wraplength=700, font=("Arial", 14), justify="center")
         self.story_label.pack(pady=20)
 
         #statystyka
-        self.stats.label = tk.Label(root, text)
+        self.stats.label = tk.Label(root, text="")
+        stats.label.pack()
+
 
 
 
