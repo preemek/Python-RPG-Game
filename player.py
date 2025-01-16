@@ -27,15 +27,3 @@ class Player:
             self.inventory.remove(item)
 
     
-class Enemy:
-    def __init__(self, name, hp):
-        self.name = name
-        self.hp = hp
-
-    def take_damage(self, damage):
-        self.hp -= damage
-        if self.hp < 0:
-            self.hp = 0
-
-    def attack(self):
-        return random.randint(1, 10)
