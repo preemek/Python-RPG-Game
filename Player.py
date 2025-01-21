@@ -2,7 +2,7 @@ import json
 import random
 
 class Player:
-    def __init__ (self,name="",HP=10,Base_Dmg=2,Equiped_Weapon="",Items={},Lvl=0,XP=0,XP_needed_to_lvl_up=10):
+    def __init__ (self,name="bartlomiej",HP=10,Base_Dmg=2,Equiped_Weapon="",Items={},Lvl=0,XP=0,XP_needed_to_lvl_up=10):
         self.name=name
         self.HP=HP
         # self.DEF=10
@@ -54,7 +54,7 @@ class Player:
             self.Equiped_Weapon=used_item
 
 
-    def create_player (self,mode:str,file_number):
+    def create_player (self,mode:str,file_number=0,*,input_name=""):
         """mode= <from_save_file> or <new_player>"""
             
         path=f"Player_Save_File{file_number}.json"
@@ -79,9 +79,9 @@ class Player:
                 print(err)
 
         elif mode == "new_player":
-            name=""
-            if len(name) <= 15:
-                self.name=name
+            name=input_name
+            # if len(name) <= 15:
+            self.name=name
             
     def save_player_data(self,file_number):
         path=f"Player_Save_File{file_number}.json"
