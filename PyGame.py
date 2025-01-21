@@ -27,17 +27,18 @@ class PythonGame:
         self.start()
     
     def clear_widgets(self):
-        for frame in self.root.winfo_children():
-            for widget in frame.winfo_children():
-                widget.destroy()
+        for widget in self.root.winfo_children():
+            widget.destroy()
         
     
     def start(self):
         self.root.geometry("600x300")
         ttk.Label(self.root,text="Welcome to Python RPG game",font=('Blackadder ITC', 20,"bold")).grid(row=0,column=0,sticky="EW")
-        ttk.Label(self.root,text="by Wiktor Durek").grid(row=1,column=0,sticky="EW")
-        ttk.Button(self.root,text="Create new character",command=self.new_character_window).grid(row=3,column=0)
-        ttk.Button(self.root,text="Load from save file",command=self.choose_save_file_window).grid(row=4,column=0)
+        root.columnconfigure(0,weight=1)
+        root.rowconfigure(0,weight=1)
+        ttk.Label(self.root,text="by Wiktor Durek").grid(row=1,column=1,sticky="EW")
+        ttk.Button(self.root,text="Create new character",command=self.new_character_window).grid(row=3,column=1)
+        ttk.Button(self.root,text="Load from save file",command=self.choose_save_file_window).grid(row=4,column=1)
         
     def main_menu(self):
         self.clear_widgets()
@@ -45,7 +46,32 @@ class PythonGame:
         ttk.Label(self.root,text=self.player.name,relief="raised",width=100,).pack(side="left",pady=50,padx=25)
     
     def choose_save_file_window(self):
-        pass
+        window=tk.Toplevel(self.root)
+        window.rowconfigure(0)
+        window.columnconfigure(1,weight=2)
+        window.rowconfigure(1,weight=1)
+
+        label = tk.Label(window,
+                 text="Hiii", 
+                 anchor=tk.CENTER,       
+                #  bg="lightblue",      
+                #  height=3,              
+                #  width=30,              
+                #  bd=3,                  
+                #  font=("Arial", 16, "bold"), 
+                #  cursor="hand2",   
+                #  fg="red",             
+                #  padx=15,               
+                #  pady=15,                
+                #  justify=tk.CENTER,    
+                #  relief=tk.RAISED,             
+                #  wraplength=250         
+                )
+        
+        label.grid(row = 2, column = 1, sticky = "NESW")
+        ttk.Button(window,text="Save 1").grid(row = 1, column = 1, sticky = "NESW")
+        ttk.Button(window,text="Save 2").grid(row = 0, column = 1, sticky = "NESW")
+        # self.main_menu()
 
 
     def new_character_window(self):
