@@ -7,7 +7,7 @@ from tkinter import messagebox
 
 def create_player(player:Player.Player,l_name):
     
-        if len(l_name) > 5:
+        if len(l_name) > 10:
             messagebox.showinfo("Information","Name to long. Name must be less than 15 characters")
         else:
             player.create_player("new_player",input_name=l_name)
@@ -19,6 +19,8 @@ class PythonGame:
         self.locations=[locations]
         self.root=root
         self.root.title("Python RPG Game")
+        # self.root.resizable(width=0,height=0)
+        self.root.eval('tk::PlaceWindow . center')
         # self.root.resizable(0,0)
         self.style=ttk.Style()
         self.style.configure("TButton",font=('Gabriola', 12),foreground="black")
@@ -32,49 +34,41 @@ class PythonGame:
         
     
     def start(self):
-        self.root.geometry("600x300")
-        ttk.Label(self.root,text="Welcome to Python RPG game",font=('Blackadder ITC', 20,"bold")).grid(row=0,column=0,sticky="EW")
+        self.root.geometry("600x300+500+200")
+        root.columnconfigure(1,weight=1)
         root.columnconfigure(0,weight=1)
-        root.rowconfigure(0,weight=1)
-        ttk.Label(self.root,text="by Wiktor Durek").grid(row=1,column=1,sticky="EW")
-        ttk.Button(self.root,text="Create new character",command=self.new_character_window).grid(row=3,column=1)
-        ttk.Button(self.root,text="Load from save file",command=self.choose_save_file_window).grid(row=4,column=1)
-        
-    def main_menu(self):
-        self.clear_widgets()
-        self.root.geometry("600x600")
-        ttk.Label(self.root,text=self.player.name,relief="raised",width=100,).pack(side="left",pady=50,padx=25)
+        root.rowconfigure(3,weight=1)
+        ttk.Label(self.root,text="Welcome to Python RPG game",font=('Blackadder ITC', 20,"bold"),anchor="center").grid(row=0,column=0,columnspan=2,pady=(30,0),sticky="EW")
+        ttk.Label(self.root,text="by Wiktor Durek",anchor="center").grid(row=1,column=0,columnspan=2,pady=(0,50),sticky="EW")
+        ttk.Button(self.root,text="Create new character",command=self.new_character_window).grid(row=3,column=0,padx=(100,20),pady=(0,80),ipadx=10,sticky="ESN")
+        ttk.Button(self.root,text="Load from save file",command=self.choose_save_file_window).grid(row=3,column=1,padx=(20,100),pady=(0,80),ipadx=10,sticky="WSN")
     
     def choose_save_file_window(self):
-        window=tk.Toplevel(self.root)
-        window.rowconfigure(0)
-        window.columnconfigure(1,weight=2)
-        window.rowconfigure(1,weight=1)
+        root.columnconfigure(1,weight=0)
+        root.columnconfigure(0,weight=0)
+        root.rowconfigure(3,weight=0)
+        def button_on(number):
+            try:
+                self.player.create_player("from_save_file",file_number=number)
+                self.main_menu()
+            except FileNotFoundError:
+                messagebox.showerror(title="File not found!",message=f"file {number} doesn't exist")
 
-        label = tk.Label(window,
-                 text="Hiii", 
-                 anchor=tk.CENTER,       
-                #  bg="lightblue",      
-                #  height=3,              
-                #  width=30,              
-                #  bd=3,                  
-                #  font=("Arial", 16, "bold"), 
-                #  cursor="hand2",   
-                #  fg="red",             
-                #  padx=15,               
-                #  pady=15,                
-                #  justify=tk.CENTER,    
-                #  relief=tk.RAISED,             
-                #  wraplength=250         
-                )
-        
-        label.grid(row = 2, column = 1, sticky = "NESW")
-        ttk.Button(window,text="Save 1").grid(row = 1, column = 1, sticky = "NESW")
-        ttk.Button(window,text="Save 2").grid(row = 0, column = 1, sticky = "NESW")
+        window=tk.Toplevel(self.root)
+        window.title("Choose save file")
+        window.geometry("400x100")
+
+        window.columnconfigure((0,1,2),weight=1)
+        window.rowconfigure(0,weight=1)
+        ttk.Button(window,text="Save 1", command=lambda:button_on(1)).grid(row = 0, column = 0, pady=30, padx=30, sticky = "NESW")
+        ttk.Button(window,text="Save 2", command=lambda:button_on(2)).grid(row = 0, column = 1, pady=30, padx=0, sticky = "NESW")
+        ttk.Button(window,text="Save 3", command=lambda:button_on(3)).grid(row = 0, column = 2, pady=30, padx=30, sticky = "NESW")
         # self.main_menu()
 
-
     def new_character_window(self):
+        root.columnconfigure(1,weight=0)
+        root.columnconfigure(0,weight=0)
+        root.rowconfigure(3,weight=0)
         def button_on():
             name = name_entry.get()
             new_char_window.destroy()
@@ -94,7 +88,11 @@ class PythonGame:
         name_entry.grid(row=0,column=1,sticky="E")
         close_button.grid(row=1,column=0,columnspan=2,sticky="E")
 
-
+    def main_menu(self):
+            self.clear_widgets()
+            self.root.geometry("600x600")
+            ttk.Label(self.root,text=f"name: {self.player.name}",relief="raised",width=10,font=('Blackadder ITC', 20,"bold")).grid(row=0,column=0,padx=10,pady=10)
+            ttk.Label(self.root,text=f"lvl: {self.player.Lvl}",relief="raised",width=10).grid(row=0,column=1,pady=10)
 
 #only for testing
 root=tk.Tk()

@@ -2,7 +2,7 @@ import json
 import random
 
 class Player:
-    def __init__ (self,name="bartlomiej",HP=10,Base_Dmg=2,Equiped_Weapon="",Items={},Lvl=0,XP=0,XP_needed_to_lvl_up=10):
+    def __init__ (self,name="None",HP=10,Base_Dmg=2,Equiped_Weapon="",Items={},Lvl=0,XP=0,XP_needed_to_lvl_up=10):
         self.name=name
         self.HP=HP
         # self.DEF=10
@@ -59,24 +59,20 @@ class Player:
             
         path=f"Player_Save_File{file_number}.json"
         if mode == "from_save_file":
-            try:
-                with open(path,'r') as player_save: 
-                    player_data = json.load(player_save)
-                    # zapisanie informacji o graczu
-                    self.name=player_data["name"]
-                    self.HP=player_data["HP"]
-                    self.Lvl=player_data["Lvl"]
-                    self.XP=player_data["XP"]
-                    self.XP_needed_to_lvl_up=player_data["XP_needed_to_lvl_up"]
-                    self.Base_Dmg=player_data["Base_Dmg"]
-                    self.Equiped_Weapon=player_data["Equiped_Weapon"]
-                    self.Items=player_data["Items"]
-                    # ---
-                    player_save.close
-            except FileNotFoundError:
-                print("File doesn't exist")
-            except Exception as err:
-                print(err)
+            with open(path,'r') as player_save: 
+                player_data = json.load(player_save)
+                # zapisanie informacji o graczu
+                self.name=player_data["name"]
+                self.HP=player_data["HP"]
+                self.Lvl=player_data["Lvl"]
+                self.XP=player_data["XP"]
+                self.XP_needed_to_lvl_up=player_data["XP_needed_to_lvl_up"]
+                self.Base_Dmg=player_data["Base_Dmg"]
+                self.Equiped_Weapon=player_data["Equiped_Weapon"]
+                self.Items=player_data["Items"]
+                # ---
+                player_save.close
+
 
         elif mode == "new_player":
             name=input_name
