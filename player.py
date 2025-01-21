@@ -1,11 +1,10 @@
 class Player:
-    def __init__(self, name):
+    def __init__(self, name, health=100):
         self.name = name
-        self.health = 100
-        self.exp = 0
-        self.level = 1
+        self.health = health
         self.inventory = []
-        
+        self.exp = 0
+
     def take_damage(self, damage):
         self.health -= damage
         if self.health < 0:
@@ -13,11 +12,10 @@ class Player:
 
     def add_exp(self, exp_points):
         self.exp += exp_points
-        if self.exp >= 20:
-            self.level_up()
+        print(f"{self.name} zdobył {exp_points} punktów doświadczenia. Teraz ma {self.exp} EXP.")
 
     def level_up(self):
-        if self.exp >= 100:
-            self.level += 1
-            self.exp -= 100
-            self.health = 100
+        self.level += 1
+        self.exp = 0
+        self.health = 100
+
