@@ -1,7 +1,9 @@
 import json
 import random
-Mace={"name":"Mace", "dmg": 3, "type":"weapon","quantity":1}
-health_potion ={"name":"health_potion","HP": 5}
+
+#testing
+mace={"type":"weapon", "name":"Mace", "dmg": 3}
+small_health_potion ={"type":"potion", "name":"small health potion","hp": 5}
 
 class Player:
     def __init__ (self,name="None",HP=10,MaxHP=10,Base_Dmg=2,Equiped_Weapon="",Items={},Lvl=0,EXP=0,EXP_needed_to_lvl_up=10):
@@ -36,29 +38,35 @@ class Player:
             self.EXP_needed_to_lvl_up *= 1.2
             int(self.EXP_needed_to_lvl_up)
             
-    def player_found_an_item (self, found_item):
+    def found_item (self, found_item):
         if f"{found_item["name"]}" in self.Items:
             self.Items[found_item["name"]]["quantity"]+=1
         else:
+            found_item["quantity"]=1
             self.Items[f"{found_item["name"]}"]=found_item
+
 
         #{"item": <item here>, "quantity" : <quantity of item>}
 # Mace={"name":"Mace", "dmg": 3, "type":"weapon"}   #weapon_name={"name":"<weapon_name>", "dmg":<number to add to dmg>, "type":"weapon"} 
 
-    def use_item (self,used_item): 
+    def use_item (self,used_item_name): 
         #example
         #if used_item == "my_item":
         #    do something
-        #//if usable(ex. potions) decrese quantity!!!
+        # if usable(ex. potions) decrese quantity!!!
         #items[used_item]["quantity"]-=1
+        item=self.Items[f"{used_item_name}"]
 
-        #sprawdzenie czy wybrany przedmiot jest w ekwipunku
+        # sprawdzenie czy wybrany przedmiot jest w ekwipunku
 
-        if used_item["type"] == "weapon":
-            self.Equiped_Weapon=used_item
-        
-        if used_item["name"] == "health_potion":
-            self.HP += min(used_item["hp"],self.MaxHP)
+        if item["type"] == "weapon":
+            self.Equiped_Weapon=used_item_name
+
+        if item["type"] == "potion":
+            if item["name"] == "small_health_potion":
+                if self.Items["health_potion"]["quantity"] !=0:
+                    self.Items["health_potion"]["quantity"]-=1
+                    self.HP = min(self.HP+item["hp"],self.MaxHP)
 
 
     def create_player (self,mode:str,file_number=0,*,input_name=""):
@@ -94,3 +102,4 @@ class Player:
                 save_file.close
         except Exception as err:
             print(err)
+
