@@ -8,7 +8,7 @@ from tkinter import messagebox
 def create_player(player:Player.Player,l_name):
     
         if len(l_name) > 10:
-            messagebox.showinfo("Information","Name to long. Name must be less than 15 characters")
+            messagebox.showinfo("Information","Name to long. Can be max 10 characters")
         else:
             player.create_player("new_player",input_name=l_name)
 
@@ -19,12 +19,16 @@ class PythonGame:
         self.locations=[locations]
         self.root=root
         self.root.title("Python RPG Game")
+        self.root.configure(background="#dcdad5")
         # self.root.resizable(width=0,height=0)
-        self.root.eval('tk::PlaceWindow . center')
-        # self.root.resizable(0,0)
+        
         self.style=ttk.Style()
-        self.style.configure("TButton",font=('Gabriola', 12),foreground="black")
-        self.style.configure("TLabel")
+        self.style.theme_use('clam')
+        self.style.configure("TButton",font=('Gabriola', 12),foreground="black",background="#c6c4bf")
+        self.style.configure("TLabel",font=('Gabriola', 12),foreground="black")
+        self.style.configure("TLabelframe.Label",font=('Gabriola', 16,"bold"),foreground="black")
+        self.style.configure("blue.Horizontal.TProgressbar", foreground='blue', background='blue')
+        self.style.configure("green.Horizontal.TProgressbar", foreground='green', background='green')
         
         self.start()
     
@@ -44,12 +48,13 @@ class PythonGame:
         ttk.Button(self.root,text="Load from save file",command=self.choose_save_file_window).grid(row=3,column=1,padx=(20,100),pady=(0,80),ipadx=10,sticky="WSN")
     
     def choose_save_file_window(self):
-        root.columnconfigure(1,weight=0)
-        root.columnconfigure(0,weight=0)
-        root.rowconfigure(3,weight=0)
+        
         def button_on(number):
             try:
                 self.player.create_player("from_save_file",file_number=number)
+                root.columnconfigure(1,weight=0)
+                root.columnconfigure(0,weight=0)
+                root.rowconfigure(3,weight=0)
                 self.main_menu()
             except FileNotFoundError:
                 messagebox.showerror(title="File not found!",message=f"file {number} doesn't exist")
@@ -66,13 +71,13 @@ class PythonGame:
         # self.main_menu()
 
     def new_character_window(self):
-        root.columnconfigure(1,weight=0)
-        root.columnconfigure(0,weight=0)
-        root.rowconfigure(3,weight=0)
         def button_on():
             name = name_entry.get()
             new_char_window.destroy()
             self.player.create_player("new_player",input_name=name)
+            root.columnconfigure(1,weight=0)
+            root.columnconfigure(0,weight=0)
+            root.rowconfigure(3,weight=0)
             self.main_menu()
             
         new_char_window = tk.Toplevel()
@@ -87,18 +92,52 @@ class PythonGame:
         name_entry_label.grid(row=0,column=0)
         name_entry.grid(row=0,column=1,sticky="E")
         close_button.grid(row=1,column=0,columnspan=2,sticky="E")
-
+    def talk (self):
+        pass
+    def explore (self):
+        pass
+    def fight (self):
+        pass
+        
     def main_menu(self):
-            self.clear_widgets()
-            self.root.geometry("600x600")
-            ttk.Label(self.root,text=f"name: {self.player.name}",relief="raised",width=10,font=('Blackadder ITC', 20,"bold")).grid(row=0,column=0,padx=10,pady=10)
-            ttk.Label(self.root,text=f"lvl: {self.player.Lvl}",relief="raised",width=10).grid(row=0,column=1,pady=10)
+        def create_user_stats (master):
+            ttk.Label(master,text=f"Name: {self.player.name}",width=16,font=('Blackadder ITC', 20,"bold")).pack(side="left",padx=10)
+            ttk.Label(master,text=f"HP: ").pack(side="left",padx=(0,10))
+            ttk.Progressbar(master,orient="horizontal",length=100,mode="determinate",maximum=self.player.MaxHP,value=self.player.HP,style="green.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
+            ttk.Label(master,text=f"LVL: {self.player.Lvl}").pack(side="left",padx=(0,10))
+            ttk.Progressbar(master,orient="horizontal",length=50,mode="determinate",maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP,style="blue.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
+            ttk.Label(master,text=f"Equiped weapon: {self.player.Equiped_Weapon}").pack(side="left",padx=(0,10))
+        self.clear_widgets()
+        self.root.geometry("700x600")
+        main_menu_frame=ttk.LabelFrame(self.root,relief="raised",text="Stats")
+        main_menu_frame.grid(row=0,column=0,padx=2,pady=2)
+        self.root.columnconfigure(0,weight=1)
+        create_user_stats(main_menu_frame)
+        
+        ttk.Button(text="Fight",command=self.fight)
+        ttk.Button(text="Explore",command=self.explore)
+        ttk.Button(text="Talk to NPC",command=self.talk)
+        
+        # ttk.Label(main_menu_frame,text=f"LVL: {self.player.Lvl}").pack(side="left")
+        # ttk.Label(main_menu_frame,text=f": {self.player.}").pack(side="left")
+        
+
+
+
 
 #only for testing
 root=tk.Tk()
-ala=PythonGame(root)
+PyGamme=PythonGame(root)
 root.mainloop()
 """
 text_varible updates contents of label when changed
+
+def function():
+    for i in range(5):
+        var.set(i)
+        root.update()
+        time.sleep(1) # to slow down
+
+root.after(1, function)
 
 """
