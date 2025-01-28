@@ -2,51 +2,9 @@
 import tkinter as tk
 from tkinter import messagebox
 import random
-
-
-class Player:
-    def __init__(self):
-        self.hp = 100
-        self.inventory = []
-        self.max_hp = 100
-
-    def take_damage(self, damage):
-        self.hp -= damage
-        if self.hp < 0:
-            self.hp = 0
-
-    def heal(self, amount):
-        self.hp += amount
-        if self.hp > self.max_hp:
-            self.hp = self.max_hp
-
-
-class Enemy:
-    def __init__(self, name, hp, min_attack, max_attack):
-        self.name = name
-        self.hp = hp
-        self.min_attack = min_attack
-        self.max_attack = max_attack
-
-    def take_damage(self, damage):
-        self.hp -= damage
-        if self.hp < 0:
-            self.hp = 0
-
-    def get_attack_power(self):
-        return random.randint(self.min_attack, self.max_attack)
-
-
-class Goblin(Enemy):
-    def __init__(self):
-        super().__init__("Goblin", hp=70, min_attack=10, max_attack=15)
-
-
-class Orc(Enemy):
-    def __init__(self):
-        super().__init__("Orc", hp=90, min_attack=15, max_attack=25)
-
-
+from player import Player
+from goblin import Goblin
+from orc import Orc
 
 class RPGGame:
     def __init__(self, root):
@@ -66,7 +24,7 @@ class RPGGame:
         self.create_location_buttons()
 
     def get_player_status(self):
-        return f"HP: {self.player.hp}/{self.player.max_hp} | Inventory: {', '.join(self.player.inventory) or 'Empty'}"
+        return f"HP: {self.player.hp}/{self.player.max_hp} | Monety: {self.player.coins} | Inventory: {', '.join(self.player.inventory) or 'Empty'}"
 
     def create_location_buttons(self):
         for widget in self.button_frame.winfo_children():
@@ -172,8 +130,10 @@ class RPGGame:
         self.enemy.take_damage(player_damage)
 
         if self.enemy.hp <= 0:
+            coins_reward = random.randint(10, 15)
+            self.player.add_coins(coins_reward)
             messagebox.showinfo("Bitwa wygrana", f"Pokonałeś {self.enemy.name}!")
-            reward = random.choice(["Złoty klucz", "Miecz", "Eliksir zdrowia"])
+            reward = random.choice(["Złoty klucz", "Eliksir zdrowia"])
             self.player.inventory.append(reward)
             self.update_status()
             self.create_location_buttons()
@@ -215,9 +175,14 @@ class RPGGame:
         self.create_village_actions()
 
     def visit_shop(self):
+        self.cena = random.randint(5, 10)
         if "Miecz" not in self.player.inventory:
-            messagebox.showinfo("Sklep", "Kupiłeś miecz!")
-            self.player.inventory.append("Miecz")
+            if self.player.coins >= self.cena:
+                messagebox.showinfo("Sklep", f"Kupiłeś miecz za {self.cena}!")
+                self.player.coins -= self.cena
+                self.player.inventory.append("Miecz")
+            else:
+                messagebox.showinfo("Sklep", f"Nie stać Cię na miecz! Potrzebujesz {self.cena} monet.")  # Исправлено на 'self.cena'
         else:
             messagebox.showinfo("Sklep", "Już masz miecz!")
         self.update_status()
