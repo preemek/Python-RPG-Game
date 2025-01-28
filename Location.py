@@ -12,11 +12,11 @@ class location:
 
     def fight (self): #wybierz przeciwnika z listy
         selected_enemy = random.choice(self.list_of_enemies)
-        return selected_enemy
+        return selected_enemy[0]
 
     def exploration (self): #szansa na zdobycie złota, broni, mikstury, itp.
         selected_event = random.choices(["loot","wishing well"],weights=[7,4]) #losowanie typu wydarzenia
-        return selected_event
+        return selected_event[0]
     
     def draw_random_item (self):
         drop_chances = [item["drop_chance"] for item in self.list_of_loot]
@@ -28,9 +28,9 @@ class location:
         
         return found_item
     
-    # def talk (self): #rozmawiaj z NPC / sklep?
-    #     selected_NPC = self.list_of_NPC
-    #     return selected_NPC
+    def talk (self): #rozmawiaj z NPC / sklep?
+        return self.list_of_NPC
+    
 strong_ork = Enemy.Enemy("Strong Ork",5,20,10)
 ork = Enemy.Enemy("Ork",2,10,4)
 strong_wolf = Enemy.Enemy("Strong Wolf",3,15,8)
@@ -43,10 +43,11 @@ gold_cacstle = {"type":"gold","name":"gold","min_amount":10,"max_amount":15,"dro
 small_health_potion ={"type":"potion", "name":"small health potion","hp": 5,"drop_chance":5}
 big_health_potion ={"type":"potion", "name":"big health potion","hp": 10,"drop_chance":5}
 
-Gregory ={"name":"Gregory","dialog":"Hello adventuer, do you want to have a ride? /YN Where do you want to go? /options","options":["village","forest","castle"]}
-forest = location("forest",[ork,wolf],[gold_forest,small_health_potion,mace],[Gregory])
-village = location("village",["no enemies"],[gold_village,wooden_sword],[Gregory])
-castle = location("castle",[strong_ork,strong_wolf],[gold_cacstle],[Gregory])
+Travel_Person ={"name":" Travel Person","dialog":"Hello adventuer, do you want to have a ride?\nWhere do you want to go?"}
+Bob = {"name":"Bob","dialog":"Hello adventuer, have you heard of princess trapped in the castle?\nBut its very scary there so prepare yourself before you go there\n"}
+forest = location("forest",[ork,wolf],[gold_forest,small_health_potion,mace],[Travel_Person])
+village = location("village",["no enemies"],[gold_village,wooden_sword],[Travel_Person,Bob])
+castle = location("castle",[strong_ork,strong_wolf],[gold_cacstle],[Travel_Person])
 
 # import Player
 # player=Player.Player(name="Bob")

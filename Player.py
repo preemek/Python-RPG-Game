@@ -5,7 +5,7 @@ import random
 mace={"type":"weapon", "name":"Mace", "dmg": 3}
 small_health_potion ={"type":"potion", "name":"small health potion","hp": 5}
 
-junk_item={"type":"weapon", "name":"", "dmg": 0}
+junk_item={"type":"weapon", "name":"nothing", "dmg": 0}
 
 class Player:
     def __init__ (self,name="None",HP=10,MaxHP=10,Base_Dmg=2,Equiped_Weapon=junk_item,Items={},Lvl=0,EXP=0,EXP_needed_to_lvl_up=10,Gold=0,Location="village"):
@@ -47,11 +47,11 @@ class Player:
             self.Gold += found_item["amount"]
             return
 
-        if f"{found_item["name"]}" in self.Items:
+        if "{}".format(found_item["name"]) in self.Items:
             self.Items[found_item["name"]]["quantity"]+=quantity
         else:
             found_item["quantity"]=quantity
-            self.Items[f"{found_item["name"]}"]=found_item
+            self.Items["{}".format(found_item["name"])]=found_item
 
 # Mace={"type":"weapon", "name":"Mace", "dmg": 3}   #weapon_name={"name":"<weapon_name>", "dmg":<number to add to dmg>, "type":"weapon"}
 
