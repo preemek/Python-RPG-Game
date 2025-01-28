@@ -1,20 +1,12 @@
 import Player
-# import Enemy
-# import Location
+import Enemy
+from Location import village, forest, castle
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-def create_player(player:Player.Player,l_name):
-    
-        if len(l_name) > 10:
-            messagebox.showinfo("Information","Name to long. Can be max 10 characters")
-        else:
-            player.create_player("new_player",input_name=l_name)
-
-
 class PythonGame:
-    def __init__(self,root:tk.Tk,locations=["ala","bab"]):
+    def __init__(self,root:tk.Tk,locations=[village,forest,castle]):
         self.player=Player.Player()
         self.locations=[locations]
         self.root=root
@@ -92,31 +84,45 @@ class PythonGame:
         name_entry_label.grid(row=0,column=0)
         name_entry.grid(row=0,column=1,sticky="E")
         close_button.grid(row=1,column=0,columnspan=2,sticky="E")
+    def locate_player(self):
+        for location in self.locations:
+            if location[0].name == self.player.Location:
+                return location[0]
     def talk (self):
-        pass
+        location=self.locate_player()
+        npc=""
+        ttk.Label(self.root,text=f"{location.name}").grid(row=1,column=1)
     def explore (self):
         pass
     def fight (self):
         pass
         
     def main_menu(self):
-        def create_user_stats (master):
-            ttk.Label(master,text=f"Name: {self.player.name}",width=16,font=('Blackadder ITC', 20,"bold")).pack(side="left",padx=10)
-            ttk.Label(master,text=f"HP: ").pack(side="left",padx=(0,10))
-            ttk.Progressbar(master,orient="horizontal",length=100,mode="determinate",maximum=self.player.MaxHP,value=self.player.HP,style="green.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
-            ttk.Label(master,text=f"LVL: {self.player.Lvl}").pack(side="left",padx=(0,10))
-            ttk.Progressbar(master,orient="horizontal",length=50,mode="determinate",maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP,style="blue.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
-            ttk.Label(master,text=f"Equiped weapon: {self.player.Equiped_Weapon}").pack(side="left",padx=(0,10))
+        def create_user_stats (option,master=tk.Tk):
+            if option =="create":
+                name=ttk.Label(master,text=f"Name: {self.player.name}",width=16,font=('Blackadder ITC', 20,"bold")).pack(side="left",padx=10)
+                hp=ttk.Label(master,text=f"HP: ").pack(side="left",padx=(0,10))
+                hp_bar=ttk.Progressbar(master,orient="horizontal",length=100,mode="determinate",maximum=self.player.MaxHP,value=self.player.HP,style="green.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
+                lvl=ttk.Label(master,text=f"LVL: {self.player.Lvl}").pack(side="left",padx=(0,10))
+                lvl_bar=ttk.Progressbar(master,orient="horizontal",length=50,mode="determinate",maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP,style="blue.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
+                eq_weapon=ttk.Label(master,text=f"Equiped weapon: {self.player.Equiped_Weapon["name"]}").pack(side="left",padx=(0,10))
+            else:
+                name.configure(text=f"Name: {self.player.name}")
+                hp.configure(text=f"HP: ")
+                hp_bar.configure(maximum=self.player.MaxHP,value=self.player.HP)
+                lvl.configure(text=f"LVL: {self.player.Lvl}")
+                lvl_bar.configure(maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP)
+                eq_weapon.configure(text=f"Equiped weapon: {self.player.Equiped_Weapon["name"]}")
         self.clear_widgets()
         self.root.geometry("700x600")
         main_menu_frame=ttk.LabelFrame(self.root,relief="raised",text="Stats")
-        main_menu_frame.grid(row=0,column=0,padx=2,pady=2)
-        self.root.columnconfigure(0,weight=1)
-        create_user_stats(main_menu_frame)
-        
-        ttk.Button(text="Fight",command=self.fight)
-        ttk.Button(text="Explore",command=self.explore)
-        ttk.Button(text="Talk to NPC",command=self.talk)
+        main_menu_frame.grid(row=0,column=0,columnspan=10,padx=2,pady=2)
+        self.root.columnconfigure((0,1,2),weight=1)
+        create_user_stats("create",main_menu_frame)
+
+        ttk.Button(text="Fight",command=self.fight,width=12).grid(row=3,column=0)
+        ttk.Button(text="Explore",command=self.explore,width=12).grid(row=3,column=1)
+        ttk.Button(text="Talk to NPC",command=self.talk,width=12).grid(row=3,column=2)
         
         # ttk.Label(main_menu_frame,text=f"LVL: {self.player.Lvl}").pack(side="left")
         # ttk.Label(main_menu_frame,text=f": {self.player.}").pack(side="left")
@@ -126,6 +132,7 @@ class PythonGame:
 
 
 #only for testing
+
 root=tk.Tk()
 PyGamme=PythonGame(root)
 root.mainloop()
