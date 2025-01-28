@@ -37,19 +37,23 @@ class PythonGame:
         ttk.Label(self.root,text="Welcome to Python RPG game",font=('Blackadder ITC', 20,"bold"),anchor="center").grid(row=0,column=0,columnspan=2,pady=(30,0),sticky="EW")
         ttk.Label(self.root,text="by Wiktor Durek",anchor="center").grid(row=1,column=0,columnspan=2,pady=(0,50),sticky="EW")
         ttk.Button(self.root,text="Create new character",command=self.new_character_window).grid(row=3,column=0,padx=(100,20),pady=(0,80),ipadx=10,sticky="ESN")
-        ttk.Button(self.root,text="Load from save file",command=self.choose_save_file_window).grid(row=3,column=1,padx=(20,100),pady=(0,80),ipadx=10,sticky="WSN")
+        ttk.Button(self.root,text="Load from save file",command=lambda:self.choose_save_file_window(option="load")).grid(row=3,column=1,padx=(20,100),pady=(0,80),ipadx=10,sticky="WSN")
     
-    def choose_save_file_window(self):
-        
+    def choose_save_file_window(self,option=""):
         def button_on(number):
-            try:
-                self.player.create_player("from_save_file",file_number=number)
-                root.columnconfigure(1,weight=0)
-                root.columnconfigure(0,weight=0)
-                root.rowconfigure(3,weight=0)
-                self.main_menu()
-            except FileNotFoundError:
-                messagebox.showerror(title="File not found!",message=f"file {number} doesn't exist")
+            if option=="load":
+                try:
+                    self.player.create_player("from_save_file",file_number=number)
+                    root.columnconfigure(1,weight=0)
+                    root.columnconfigure(0,weight=0)
+                    root.rowconfigure(3,weight=0)
+                    self.main_menu()
+                    window.destroy()
+                except FileNotFoundError:
+                    messagebox.showerror(title="File not found!",message=f"file {number} doesn't exist")
+            if option=="save":
+                self.player.save_player_data(file_number=number)
+                window.destroy()
 
         window=tk.Toplevel(self.root)
         window.title("Choose save file")
@@ -93,37 +97,31 @@ class PythonGame:
         npc=""
         ttk.Label(self.root,text=f"{location.name}").grid(row=1,column=1)
     def explore (self):
-        pass
+        location=self.locate_player()
     def fight (self):
         pass
         
     def main_menu(self):
-        def create_user_stats (option,master=tk.Tk):
-            if option =="create":
-                name=ttk.Label(master,text=f"Name: {self.player.name}",width=16,font=('Blackadder ITC', 20,"bold")).pack(side="left",padx=10)
-                hp=ttk.Label(master,text=f"HP: ").pack(side="left",padx=(0,10))
-                hp_bar=ttk.Progressbar(master,orient="horizontal",length=100,mode="determinate",maximum=self.player.MaxHP,value=self.player.HP,style="green.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
-                lvl=ttk.Label(master,text=f"LVL: {self.player.Lvl}").pack(side="left",padx=(0,10))
-                lvl_bar=ttk.Progressbar(master,orient="horizontal",length=50,mode="determinate",maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP,style="blue.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
-                eq_weapon=ttk.Label(master,text=f"Equiped weapon: {self.player.Equiped_Weapon["name"]}").pack(side="left",padx=(0,10))
-            else:
-                name.configure(text=f"Name: {self.player.name}")
-                hp.configure(text=f"HP: ")
-                hp_bar.configure(maximum=self.player.MaxHP,value=self.player.HP)
-                lvl.configure(text=f"LVL: {self.player.Lvl}")
-                lvl_bar.configure(maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP)
-                eq_weapon.configure(text=f"Equiped weapon: {self.player.Equiped_Weapon["name"]}")
+        def create_user_stats (master=tk.Tk()):
+            for widget in master.winfo_children():
+                widget.destroy()
+            ttk.Label(master,text=f"Name: {self.player.name}",width=16,font=('Blackadder ITC', 20,"bold")).pack(side="left",padx=10)
+            ttk.Label(master,text=f"HP: ").pack(side="left",padx=(0,10))
+            ttk.Progressbar(master,orient="horizontal",length=100,mode="determinate",maximum=self.player.MaxHP,value=self.player.HP,style="green.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
+            ttk.Label(master,text=f"LVL: {self.player.Lvl}").pack(side="left",padx=(0,10))
+            ttk.Progressbar(master,orient="horizontal",length=50,mode="determinate",maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP,style="blue.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
+            ttk.Label(master,text=f"Equiped weapon: {self.player.Equiped_Weapon["name"]}").pack(side="left",padx=(0,10))
         self.clear_widgets()
         self.root.geometry("700x600")
         main_menu_frame=ttk.LabelFrame(self.root,relief="raised",text="Stats")
         main_menu_frame.grid(row=0,column=0,columnspan=10,padx=2,pady=2)
-        self.root.columnconfigure((0,1,2),weight=1)
-        create_user_stats("create",main_menu_frame)
-
-        ttk.Button(text="Fight",command=self.fight,width=12).grid(row=3,column=0)
+        self.root.columnconfigure((0,1,2,3),weight=1)
+        create_user_stats(main_menu_frame)
+        self.player.Lvl=10
+        ttk.Button(text="Fight",command=self.fight,width=12).grid(row=3,column=0,padx=(33,0))
         ttk.Button(text="Explore",command=self.explore,width=12).grid(row=3,column=1)
         ttk.Button(text="Talk to NPC",command=self.talk,width=12).grid(row=3,column=2)
-        
+        ttk.Button(text="save file",command=lambda:self.choose_save_file_window("save")).grid(row=3,column=3,padx=(0,33))
         # ttk.Label(main_menu_frame,text=f"LVL: {self.player.Lvl}").pack(side="left")
         # ttk.Label(main_menu_frame,text=f": {self.player.}").pack(side="left")
         

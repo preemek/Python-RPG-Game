@@ -1,1 +1,1 @@
-{"name": "Bob", "HP": 10, "MaxHP": 10, "Lvl": 0, "EXP": 0, "EXP_needed_to_lvl_up": 10, "Base_Dmg": 2, "Equiped_Weapon": {"type": "weapon", "name": "", "dmg": 0}, "Items": {}, "Gold": 0, "Location": "village"}
+{"name": "Bob", "HP": 10, "MaxHP": 10, "Lvl": 10, "EXP": 0, "EXP_needed_to_lvl_up": 10, "Base_Dmg": 2, "Equiped_Weapon": {"type": "weapon", "name": "", "dmg": 0}, "Items": {}, "Gold": 0, "Location": "village"}
