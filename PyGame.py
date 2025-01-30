@@ -8,7 +8,7 @@ from tkinter import messagebox
 class PythonGame:
     def __init__(self,root:tk.Tk,locations=[village,forest,castle]):
         self.player=Player.Player()
-        self.locations=[locations]
+        self.locations=locations
         self.root=root
         self.root.title("Python RPG Game")
         self.root.configure(background="#dcdad5")
@@ -92,13 +92,13 @@ class PythonGame:
 
     def locate_player(self):
         for location in self.locations:
-            if location[0].name == self.player.Location:
-                return location[0]
+            if location.name == self.player.Location:
+                return location
             
     def talk (self):
         location=self.locate_player()
         scrollbar = tk.Scrollbar(self.root)
-        listbox = tk.Listbox(self.root, height = 10, width = 15, bg = "#c6c4bf", activestyle = 'dotbox', font = ('Gabriola', 16,"bold"),fg = "black",yscrollcommand=scrollbar.set)
+        listbox = tk.Listbox(self.root, height = 5, width = 15, bg = "#c6c4bf", activestyle = 'dotbox', font = ('Gabriola', 16,"bold"),fg = "black",yscrollcommand=scrollbar.set)
         scrollbar.config(command=listbox.yview)
         def on_select(event):
             w = event.widget
@@ -111,8 +111,6 @@ class PythonGame:
                 self.normal_dialog(npc)
             else:
                 self.travel(npc)
-                
-                
 
         listbox.bind('<<ListboxSelect>>', on_select)
         n=0 
@@ -126,37 +124,46 @@ class PythonGame:
         dialog=npc["dialog"].splitlines()
         text=dialog.pop(0)
         dialog_label=ttk.Label(text=f"{text}")
-        dialog_label.grid(row=1,column=0,columnspan=4)
+        dialog_label.grid(row=1,column=0,columnspan=4,pady=(10,0))
         def next_dialog():
             if len(dialog)==0:
                 self.main_menu()
             else:
                 text=dialog.pop(0)
                 dialog_label.config(text=f"{text}")
-        ttk.Button(text="next",command=lambda:next_dialog()).grid(row=2,column=0)
+        window=tk.PanedWindow(self.root,orient="vertical")
+        window.grid(row=2,column=0,columnspan=4,pady=(40,100))
+        window.add(ttk.Button(window,text="next",command=lambda:next_dialog()))
 
     def travel(self,npc):
         def quit():
             self.main_menu()
         def choose_location():
             def on_select(event):
-                print("hii")
+                w = event.widget
+                index = int(w.curselection()[0])
+                self.player.Location="{}".format(self.locations[index].name)
+                self.main_menu()
+            
             Yes_Button.destroy()
             No_Button.destroy()
 
+
+            window=tk.PanedWindow(self.root,orient="vertical")
+            window.grid(row=2,column=0,columnspan=4,pady=(40,100))
+            
             text=dialog.pop(0)
             dialog_label.config(text=text)
-            scrollbar = tk.Scrollbar(self.root)
-            listbox = tk.Listbox(self.root, height = 2, width = 15, bg = "#c6c4bf", activestyle = 'dotbox', font = ('Gabriola', 16,"bold"),fg = "black",yscrollcommand=scrollbar.set)
-            scrollbar.config(command=listbox.yview)
+            # scrollbar = tk.Scrollbar(self.root)
+            listbox = tk.Listbox(window, height = 3,width=15, bg = "#c6c4bf", activestyle = 'dotbox', font = ('Gabriola', 16,"bold"),fg = "black")
+            # scrollbar.config(command=listbox.yview)
             listbox.bind('<<ListboxSelect>>', on_select)
+            window.add(listbox)
+            
             n=0 
-            print(self.locations)
-            for i in range(5):
-                listbox.insert(i,f"hii{i}")
-            # for location in self.locations:
-            #     listbox.insert(n, str(location[0].name))
-            #     n+=1
+            for location in (self.locations):
+                listbox.insert(n, str(location.name))
+                n+=1
             listbox.grid(row=2,column=0)
 
         dialog=npc["dialog"].splitlines()
@@ -168,7 +175,6 @@ class PythonGame:
         Yes_Button.grid(row=2,column=1)
         No_Button=ttk.Button(text="No",command=quit,width=10)
         No_Button.grid(row=2,column=2)
-        
         
 
     def explore (self):
@@ -189,9 +195,10 @@ class PythonGame:
             ttk.Label(master,text=f"LVL: {self.player.Lvl}").pack(side="left",padx=(0,10))
             ttk.Progressbar(master,orient="horizontal",length=50,mode="determinate",maximum=self.player.EXP_needed_to_lvl_up,value=self.player.EXP,style="blue.Horizontal.TProgressbar").pack(side="left",padx=(0,10))
             ttk.Label(master,text="Equiped weapon: {}".format(self.player.Equiped_Weapon["name"])).pack(side="left",padx=(0,10))
+            ttk.Label(master,text=f"Location: {self.player.Location}").pack(side="left",padx=(0,10))
 
         self.clear_widgets_in_root()
-        self.root.geometry("700x600")
+        self.root.geometry("720x600+300+100")
         main_menu_frame=ttk.LabelFrame(self.root,relief="raised",text="Stats")
         main_menu_frame.grid(row=0,column=0,columnspan=10,padx=2,pady=2)
         self.root.columnconfigure((0,1,2,3),weight=1)
