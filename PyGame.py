@@ -172,6 +172,7 @@ class PythonGame:
         dialog_label.grid(row=1,column=0,columnspan=4)
         
         Yes_Button=ttk.Button(text="Yes",command=choose_location,width=10)
+        Yes_Button.pack(side="")
         Yes_Button.grid(row=2,column=1)
         No_Button=ttk.Button(text="No",command=quit,width=10)
         No_Button.grid(row=2,column=2)
@@ -183,8 +184,22 @@ class PythonGame:
         if event=="loot":
             pass
     def fight (self):
-        pass
+        location=self.locate_player()
+        enemy=location.fight
+        ttk.Label()
+        Yes_Button=ttk.Button(text="Yes",command=fight,width=10)
+        Yes_Button.grid(row=2,column=1)
+        No_Button=ttk.Button(text="No",command=quit,width=10)
+        No_Button.grid(row=2,column=2)
         
+        def quit():
+            self.main_menu()
+        def fight():
+            Yes_Button.destroy()
+            No_Button.destroy()
+            while enemy.hp > 0:
+                pass
+
     def main_menu(self):
         def create_user_stats (master=None):
             for widget in master.winfo_children():
@@ -204,10 +219,10 @@ class PythonGame:
         self.root.columnconfigure((0,1,2,3),weight=1)
         create_user_stats(main_menu_frame)
         self.player.Lvl=10
-        ttk.Button(text="Fight",command=self.fight,width=12).grid(row=3,column=0,padx=(33,0))
-        ttk.Button(text="Explore",command=self.explore,width=12).grid(row=3,column=1)
-        ttk.Button(text="Talk to NPC",command=self.talk,width=12).grid(row=3,column=2)
-        ttk.Button(text="save file",command=lambda:self.choose_save_file_window("save")).grid(row=3,column=3,padx=(0,33))
+        ttk.Button(text="Fight",command=self.fight,width=12).grid(row=5,column=0,padx=(33,0))
+        ttk.Button(text="Explore",command=self.explore,width=12).grid(row=5,column=1)
+        ttk.Button(text="Talk to NPC",command=self.talk,width=12).grid(row=5,column=2)
+        ttk.Button(text="save file",command=lambda:self.choose_save_file_window("save")).grid(row=5,column=3,padx=(0,33))
         # ttk.Label(main_menu_frame,text=f"LVL: {self.player.Lvl}").pack(side="left")
         # ttk.Label(main_menu_frame,text=f": {self.player.}").pack(side="left")
         
