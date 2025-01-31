@@ -8,7 +8,7 @@ class Enemy:
         self.XP_on_death=XP_on_death
     
     def attack(self):
-        dmg_dealt = random.randint(self.base_dmg,self.base_dmg*1.5)
+        dmg_dealt = random.randint(self.base_dmg,int(self.base_dmg*1.5))
         return dmg_dealt
     def take_dmg (self, dmg_taken):
         self.hp -= dmg_taken

@@ -29,7 +29,7 @@ class Player:
             pass
 
     def attack (self):
-        dmg_dealt = random.randint(self.Base_Dmg,self.Base_Dmg*1.5) #losuj wartość na podstawie self.Base_Dmg
+        dmg_dealt = random.randint(self.Base_Dmg,int(self.Base_Dmg*1.5)) #losuj wartość na podstawie self.Base_Dmg
         dmg_dealt += self.Equiped_Weapon["dmg"]
         return dmg_dealt
     

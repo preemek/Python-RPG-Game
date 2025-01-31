@@ -1,19 +1,13 @@
 #Wiktor
 import PyGame
-from Player import * # do testowania
-import tkinter
+import tkinter as tk
 
-# class rpg_game:
-#     Player1 = create_player()
-# player1 = Player()
-# # player1.create_player(mode="new_player",file_number=3)
-# player1.create_player(mode="from_save_file",file_number=3)
-# print(player1.name)
-# player1.Lvl=1
-# player1.save_player_data(1)
+if __name__ == "__main__":
 
-root=tkinter.Tk()
-game=PyGame.PythonGame()
+    root=tk.Tk()
+    PyGamme=PyGame.PythonGame(root)
+    root.mainloop()
+
 
 
 
