@@ -1,133 +1,134 @@
 #Dm1tro07
 
-import random as r
-
-hp=0
-coins=0
-damage=0
-class Game:
-     
-    def printParametrs():
-    print ("U ciebie {0} HP, {1} coins i {2}damage.".format(hp,coins,damage))
-
-    def printHP():
-    print("U ciebie", HP, "HP.")
-    def printDamage():
-    print("U ciebie", damage, "damage.")
-    def printCoins():
-    print("U ciebie", coins, "dollars.")
-    def initGame(initHP,initCoins,initDamage):
-    global hp
-    global coins
-    global damage
-    hp=initHP
-    coins=initCoins
-    damage=initDamage
-    print("Wyruszyłeś na prygodę.Dobrych przygod!")
-    printParametrs()
-
-    def gameLoop():
-    situation= r.randint(0,10)
-    if situation == 0:
-        Shop()
-    
-        input("Shop")
-    elif situation == 1:
-        input("monster")
-    else:
-        input("Wandering...")
-
-initGame (3,5,1)
-while True:
-    gameLoop()
-    if hp <=0:
-        if input ("Want to start again(Yes/No):").lower() =="Yes":
-            initGame(3,5,1)
-    else:
-        break 
-class sklep:
-    def Shop():
-    global hp
-    global coins
-    global damage
-    def buy (dollars):
-    global coins
-    if coins >=dollars:
-        dollars -= dollars
-        return True
-    else:
-        print("U ciebie braknie dollars!")
-        return False
-    
-weaponLVL = r.randint(1,3)
-weaponDamage=r.randint(1,5)
-weapons= ["AK-47","Iron Sword","Showel"]
-weapondollars=r.randint(2,10)
-weapon=r.choice(weapons)
-OneHpDollars= 3
-ThreeHpDollars=6
-SixHpDollars=12
-print("You met a merchant on the way ")
-printParametrs()
-while input("What will you do,(come in/come out?)").lower()== "come in":
-    print("1) One unit of health", OneHpDollars ,"dollars")
-    print("2) Two unit of health", TwoHpDollars ,"dollars")
-    print("3) {0} {1} - {2} dollars".format(weaponRarity,weapon,weapondollars))
-
-    Choice = input(" Co chcesz cupić:")
-    if Choice == "1":
-        if buy(OneHpDollars):
-            HP +=1
-            printHP()
-    elif choice == "2":
-        if buy (ThreeHpDollars):
-            HP +=3
-            printHP()
-    elif choice == "3":
-        if buy (weaponDollars):
-            damage= weaponDamage
-            printDamage()
-    else:
-        print("Nie spredaję tego")
+import random 
+import tkinter as tk
+from tkinter import msgbox
+from player import player
+from location import basement,house,city  
+from enemy import Enemy
 
 
-    
-    
-  
+def initialize_player():
+    global player
+    player = player()
+
+class Game: 
+
+def __init__(self, root):
+        self.root = root
+        self.status_label = None
+        self.name_exit = None
+        self.start_button = None
+        self.setup_start_screen()
+
+def setup_start_screen(self):
+        tk.Label(self.root, text="Wpisz swoje imię i rozpocznij przygodę!", font=("Groow", 20)).pack(pady=10)
+        self.name_entry = tk.Entry(self.root, font=("Groow", 18))
+        self.name_entry.pack(pady=10)
+
+        self.start_button = tk.Button(self.root, text="start game", font=("Groow", 16), team=self.start_game)
+        self.start_button.pack(pady=15)
+
+        self.status_label = tk.Label(self.root, text="", font=("Groow", 14))
+        self.status_label.pack(pady=10)
+
+def update_status(self):
+        self.status_label.config(text=f"{player.name}\nhp: {player.hp}\nLevel: {player.level}\nXP: {player.experience}\nLocation: {player.location.name if player.location else 'None'}\nInventory: {', '.join(player.inventory) if player.inventory else 'Empty'}")
+
+def start_game(self):
+        player.name = self.name_entry.get()
+        if not player.name:
+            msgbox.showerror("Błąd", "Wprowadź nazwę, aby rozpocząć grę!")
+            return
+        self.main_menu()
+
+def main_menu(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        tk.Label(self.root, text=f"Powitanie {player.name}!", font=("Groow", 20)).pack(pady=10)
+
+        locations = [
+            "basement":basement(),
+            "house": house(),
+            "city":city ()
+        ]
+
+        for location in locations.values():
+            tk.Button(self.root, text=location.name, font=("Groow", 18), command=lambda loc=location: self.enter_location(loc)).pack(pady=7)
+
+        self.update_status()
+
+def enter_location(self, location):
+        player.location = location
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        tk.Label(self.root, text=f"{location.name}", font=("Groow", 18)).pack(pady=10)
+        tk.Label(self.root, text=location.description, font=("Groow", 14)).pack(pady=10)
+
+        for action in location.actions:
+            tk.Button(self.root, text=action, font=("Groow", 18), command=lambda act=action: self.perform_action(location, act)).pack(pady=7)
+
+        tk.Button(self.root, text="Powrót do menu", font=("Groow", 18), command=self.main_menu).pack(pady=20)
+
+    def perform_action(self, location, action):
+        if action == "Fight":
+            self.fight()
+        elif action == "Explore":
+            self.explore(location)
+        elif action == "Talk":
+            self.talk(location)
+
+    def fight(self):
+        enemy = random.choice(enemy)
+        result = msgbox.askyesno("Walka", f"Dziki {enemy.name} pojawia się! Czy chcesz walczyć?")
+
+        if result:
+            while enemy.hp > 0 and player.hp > 0:
+                enemy.hp -= player.attack()
+                if enemy.hp <= 0:
+                    player.experience += 20
+                    if player.experience >= player.level * 40:
+                        player.level += 1
+                        player.base_damage = (player.base_damage[0] + 2, player.base_damage[1] + 2)
+                    messagebox.showinfo("Zwycięzcay", f"Pokonałeś {enemy.name}! Zdobyte 35 XP.")
+                    break
+
+                player.hp -= enemy.attack()
+                if player.hp <= 0:
+                    mesgbox.showerror("Koniec gry", "Zostałeś pokonany!")
+                    self.root.destroy()
+                    return
+
+            self.update_status()
+
+    def explore(self, location):
+        event = random.choice(["znaleziony przedmiot", "pułapka", "kupiec"])
+        if event == "znaleziony przedmiot":
+            item = random.choice(["Mikstura Zdrowia", "Miecz"])
+            player.inventory.append(przedmiot)
+            mesgbox.showinfo("Explore", f"Znalazłeś {przedmiot}!")
+        elif event == "pułapka":
+            damage = random.randint(3, 9)
+            player.hp -= dmg
+            messagebox.showwarning("pułapka", f"Uruchomiłeś pułapkę i przegrałeś {dmg} HP!")
+            if player.hp <= 0:
+                mesgbox.showerror("Koniec gry", "Zostałeś pokonany przez pułapkę!")
+                self.root.destroy()
+                return
+        elif event == "kupiec":
+            mesgbox.showinfo("kupiec", "Spotkałeś podróżującego kupca, ale nie miałeś złota na handel.")
+        self.update_status()
+
+    def talk(self, location):
+        mesgbox.showinfo("Talk", f"Rozmawiasz z mieszkańcami w {location.name}. Wydają się przyjaźni, ale mają niewiele do powiedzenia.")
 
 
-
-
-
-
-     def initGame(initHP,initCoins,initDamage):
-    global hp
-    global coins
-    global damage
-    hp=initHP
-    coins=initCoins
-    damage=initDamage
-    print("Wyruszyłeś na prygodę.Dobrych przygod!")
-    printParametrs()
-
-     def gameLoop():
-    situation= r.randint(0,10)
-    if situation == 0:
-        Shop()
-        input("Shop")
-    elif situation == 1:
-        input("monster")
-    else:
-        input("Wandering...")
-
-initGame (3,5,1)
-while True:
-    gameLoop()
-    if hp <=0:
-        if input ("Want to start again(Yes/No):").lower() =="Yes":
-            initGame(3,5,1)
-    else:
-        break 
-
-
+if __name__ == "__main__":
+    initialize_player()
+    root = tk.Tk()
+    root.title("Text RPG Game")
+    game = Game(root)
+    root.mainloop()
 
