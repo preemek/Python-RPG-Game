@@ -14,4 +14,8 @@ class Enemy:
         self.hp -= dmg_taken
 
 
-#Może dodanie przeciwników jako klasy dziedziczące klasę Enemy żeby dodać unikatowe umiejętności
+strong_ork = Enemy("Strong Ork",5,20,10)
+ork = Enemy("Ork",2,10,4)
+strong_wolf = Enemy("Strong Wolf",3,15,8)
+wolf = Enemy("Wolf",1,6,2)
+cursed_tree = Enemy("Cursed tree",2,20,8)

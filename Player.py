@@ -17,10 +17,10 @@ class Player:
         self.EXP=EXP
         self.EXP_needed_to_lvl_up=EXP_needed_to_lvl_up
         self.Base_Dmg=Base_Dmg
-        self.Equiped_Weapon=Equiped_Weapon #its a dict
-        self.Items=Items   # accesing items <name>.Items[f"{<accesed item>["name"]}"]["quantity"]
+        self.Equiped_Weapon:dict = Equiped_Weapon
+        self.Items:dict = Items
         self.Gold=Gold
-        self.Location=Location 
+        self.Location:str = Location
     def take_dmg (self, dmg_taken): #jeżeli będą dodane zbroje, będzie to przydatne do obliczeń
         #dmg_taken = dmg_taken * max(1-self.DEF, 0.5) // ex. self.DEF = (0.2), armor negates 20% of dmg taken. If armor has negative value it will make player: Player take more dmg
         self.HP -= dmg_taken
@@ -55,27 +55,24 @@ class Player:
 
 # Mace={"type":"weapon", "name":"Mace", "dmg": 3}   #weapon_name={"name":"<weapon_name>", "dmg":<number to add to dmg>, "type":"weapon"}
 
-    def use_item (self,used_item_name):
-        
+    def use_item (self,used_item_name:str):
+
         # sprawdzenie czy wybrany przedmiot jest w ekwipunku
         try:
             if self.Items[f"{used_item_name}"]["quantity"] > 0:
                 item=self.Items[f"{used_item_name}"]
             else:
-                item={"type":"no item in inventory"}
+                item={"type":"no item in inventory","quantity":1}
                 print("no item in inventory!")
         except KeyError:
-            item={"type":"no item in inventory"}
+            item={"type":"no item in inventory","quantity":1}
 
         if item["type"] == "weapon":
             self.Equiped_Weapon=self.Items[f"{used_item_name}"]
         elif item["type"] == "potion":
-            if item["name"] == "small health potion":
-                self.Items["small health potion"]["quantity"]-=1
-                self.HP = min(self.HP+item["hp"],self.MaxHP)
-            if item["name"] == "big health potion":
-                self.Items["big health potion"]["quantity"]-=1
-                self.HP = min(self.HP+item["hp"],self.MaxHP)
+            
+            self.Items[f"{used_item_name}"]["quantity"]-=1
+            self.HP = min(self.HP+item["hp"],self.MaxHP)
         else:
             print("item without use")
 

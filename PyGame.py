@@ -2,6 +2,7 @@ from typing import Literal
 import Player
 import Enemy
 from Location import village, forest, castle
+from Location import location
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -9,13 +10,13 @@ from tkinter import messagebox
 class PythonGame:
     def __init__(self,root:tk.Tk,locations=[village,forest,castle]):
         self.player=Player.Player()
-        # self.fight_counter=0 # i dont know how to make that without making varible here
-        self.locations=locations
+        self.locations:list[location]=locations # stores location class objects
         self.root=root
         self.root.title("Python RPG Game")
         self.root.configure(background="#dcdad5")
-        # self.root.resizable(width=0,height=0)
-        
+        self.root.resizable(width=0,height=0)
+        self.stats=ttk.Labelframe(self.root,relief="raised",text="Stats")
+        # styles
         self.style=ttk.Style()
         self.style.theme_use('clam')
         self.style.configure("TButton",font=('Gabriola', 12),foreground="black",background="#c6c4bf")
@@ -26,10 +27,13 @@ class PythonGame:
         self.style.configure("green.Horizontal.TProgressbar", foreground='green', background='green')
         
         self.start()
-    
+
     def clear_widgets_in_root(self):
+        """clear all widgets in ``self.root``"""
         for widget in self.root.winfo_children():
-            widget.destroy()
+            if widget != self.stats:
+                widget.destroy()
+
     def start(self):
         self.root.geometry("600x300+400+200")
         root.columnconfigure(1,weight=1)
@@ -39,10 +43,11 @@ class PythonGame:
         ttk.Label(self.root,text="by Wiktor Durek",anchor="center").grid(row=1,column=0,columnspan=2,pady=(0,50),sticky="EW")
         ttk.Button(self.root,text="Create new character",command=self.new_character_window).grid(row=3,column=0,padx=(100,20),pady=(0,80),ipadx=10,sticky="ESN")
         ttk.Button(self.root,text="Load from save file",command=lambda:self.choose_save_file_window(option="load")).grid(row=3,column=1,padx=(20,100),pady=(0,80),ipadx=10,sticky="WSN")
-    
+
     def game_over(self):
         self.root.destroy()
         messagebox.showinfo("Game over","you've been defeated, try again next time!")
+
     def choose_save_file_window(self,option:Literal["save","load"]):
         def button_on(number):
             if option=="load":
@@ -63,13 +68,14 @@ class PythonGame:
         window.title("Choose save file")
         window.geometry("400x100+300+200")
         window.configure(background="#dcdad5")
+        if option=="save":
+            window.protocol("WM_DELETE_WINDOW",lambda:[window.destroy(),self.main_menu()])
 
         window.columnconfigure((0,1,2),weight=1)
         window.rowconfigure(0,weight=1)
         ttk.Button(window,text="Save 1", command=lambda:button_on(1)).grid(row = 0, column = 0, pady=30, padx=30, sticky = "NESW")
         ttk.Button(window,text="Save 2", command=lambda:button_on(2)).grid(row = 0, column = 1, pady=30, padx=0, sticky = "NESW")
         ttk.Button(window,text="Save 3", command=lambda:button_on(3)).grid(row = 0, column = 2, pady=30, padx=30, sticky = "NESW")
-        # self.main_menu()
 
     def new_character_window(self):
         def button_on():
@@ -96,7 +102,8 @@ class PythonGame:
         name_entry.grid(row=0,column=1,sticky="E",padx=(0,10))
         close_button.grid(row=1,column=0,columnspan=2,sticky="ES",pady=(5,10),padx=10)
 
-    def locate_player(self):
+    def locate_player(self) -> location:
+        """returns ``location`` object of current player location"""
         for location in self.locations:
             if location.name == self.player.Location:
                 return location
@@ -107,8 +114,8 @@ class PythonGame:
         window.grid(row=2,column=0,columnspan=4,pady=(40,100))
         listbox = tk.Listbox(window, height = 5, width = 15, bg = "#c6c4bf", activestyle = 'dotbox', font = ('Gabriola', 16,"bold"),fg = "black")
         listbox.pack()
-        def on_select(event):
-            w = event.widget
+        def on_select(event:tk.Event):
+            w:tk.Listbox = event.widget
             index = int(w.curselection()[0])
             npc=location.talk()
             npc=npc[index]
@@ -119,16 +126,14 @@ class PythonGame:
                 self.travel(npc)
 
         listbox.bind('<<ListboxSelect>>', on_select)
-        n=0 
-        for npc in location.talk():
-            listbox.insert(n, str(npc["name"]))
-            n+=1
-        listbox.grid(row=2,column=0)
-        #after npc selection
-    def normal_dialog(self,npc):
         
-        dialog=npc["dialog"].splitlines()
-        text=dialog.pop(0)
+        for npc in location.talk():
+            listbox.insert(tk.END, str(npc["name"]))
+        listbox.grid(row=2,column=0)
+
+    def normal_dialog(self,npc):
+        dialog:list = npc["dialog"].splitlines()
+        text:str = dialog.pop(0)
         dialog_label=ttk.Label(text=f"{text}")
         dialog_label.grid(row=1,column=0,columnspan=4,pady=(10,0))
         def next_dialog():
@@ -145,15 +150,14 @@ class PythonGame:
         def quit():
             self.main_menu()
         def choose_location():
-            def on_select(event):
-                w = event.widget
+            def on_select(event:tk.Event):
+                w:tk.Listbox = event.widget
                 index = int(w.curselection()[0])
                 self.player.Location="{}".format(self.locations[index].name)
                 self.main_menu()
             
             Yes_Button.destroy()
             No_Button.destroy()
-
 
             window=tk.Frame(self.root)
             window.grid(row=2,column=0,columnspan=4,pady=(40,100))
@@ -164,31 +168,57 @@ class PythonGame:
             listbox.pack()
             listbox.bind('<<ListboxSelect>>', on_select)
             
-            
-            n=0 
-            for location in (self.locations):
-                listbox.insert(n, str(location.name))
-                n+=1
+            for location in self.locations:
+                listbox.insert(tk.END, str(location.name))
             listbox.grid(row=2,column=0)
 
-        dialog=npc["dialog"].splitlines()
+        dialog:list[str]=npc["dialog"].splitlines()
         text=dialog.pop(0)
         dialog_label=ttk.Label(text=f"{text}")
         dialog_label.grid(row=1,column=0,columnspan=4)
         
         Yes_Button=ttk.Button(text="Yes",command=choose_location,width=10)
-        Yes_Button.grid(row=2,column=1,pady=10)
         No_Button=ttk.Button(text="No",command=quit,width=10)
-        No_Button.grid(row=2,column=2,pady=10)
+        Yes_Button.grid(row=2,column=0,columnspan=2,sticky="e",padx=(0,177),pady=(10,50))
+        No_Button.grid(row=2,column=1,columnspan=2,sticky="w",padx=(177,0),pady=(10,50))
         
-
     def explore (self):
+        def quit():
+            self.main_menu()
         location=self.locate_player()
         event=location.exploration()
+
         if event=="loot":
-            pass
-    def fight (self,stats:ttk.Labelframe):
+            found_item = location.draw_random_item()
+            ttk.Label(text="You have just found {}".format(found_item["name"])).grid(row=1,column=0,columnspan=4)
+            self.player.found_item(found_item)
+            ttk.Button(text="continue",command=self.main_menu).grid(row=2,column=1,pady=20)
+
+        if event=="wishing well":
+            def throw_coin():
+                if self.player.Gold > 0:
+                    self.player.Gold-=1
+
+                    found_item=location.draw_from_wishing_well()
+                    if found_item!="nothing":
+                        wishing_well_label.configure(text="You have just found {}\n you have {} Gold".format(found_item["name"],self.player.Gold))
+                        self.player.found_item(found_item)
+                    else:
+                        wishing_well_label.configure(text="There's nothing here, try again\n you have {} Gold".format(self.player.Gold))
+
+                else:
+                    wishing_well_label.configure(text="You don't have any gold left")
+
+            wishing_well_label=ttk.Label(text="you have found a wishing well\n you have {} Gold".format(self.player.Gold),justify="center")
+            wishing_well_label.grid(row=2,column=0,columnspan=4)
+            
+            ttk.Button(text="throw coin",command=throw_coin).grid(row=3,column=0,columnspan=2,sticky="e",padx=(0,177),pady=(10,50))
+            ttk.Button(text="leave",command=quit).grid(row=3,column=1,columnspan=2,sticky="w",padx=(177,0),pady=(10,50))
+    
+    def fight (self):
         self.counter=0
+        def quit():
+            self.main_menu()
         def fight():
                 
             Yes_Button.destroy()
@@ -198,21 +228,23 @@ class PythonGame:
             def enemy_defeated():
                 log.insert(tk.END,f"you've just defeated {enemy.name}!")
                 log.insert(tk.END,f"you've recieved XP!")
+
                 player_lvl_before=self.player.Lvl
+                
                 self.player.recieve_EXP(enemy.XP_on_death)
                 if self.player.Lvl > player_lvl_before:
                     log.insert(tk.END,f"you've reached lvl {self.player.Lvl}!")
 
-                for widget in stats.winfo_children():
-                        widget.destroy()
-                self.create_user_stats(stats)
+                self.create_user_stats()
                 
-                button.config(text="ok",command=self.main_menu)
+                button.config(text="continue",command=self.main_menu)
 
             def progress_round():
                 if self.counter%2==0:
+                    button.config(text="enemy's turn")
                     player_turn()
                 else:
+                    button.config(text="your turn")
                     enemy_turn()
                 self.counter+=1
 
@@ -227,22 +259,18 @@ class PythonGame:
                 enemy_dmg=enemy.attack()
                 log.insert(tk.END,f"you've been hit by {enemy.name} for {enemy_dmg} dmg!")
                 self.player.take_dmg(enemy_dmg)
-                for widget in stats.winfo_children():
-                    widget.destroy()
-                self.create_user_stats(stats)
+                self.create_user_stats()
                 if self.player.HP <= 0:
                     self.game_over()
             
             window=tk.Frame(self.root,background="#dcdad5")
-            window.grid(row=4,column=0,columnspan=4,pady=20)
+            window.grid(row=2,column=0,columnspan=3,pady=20)
+            scroll = tk.Scrollbar(window, orient='vertical')
+            scroll.pack(side="right",padx=(0,10)) 
             log=tk.Listbox(window,height=5,width=40,background="#dcdad5",relief="sunken")
-            log.pack(side="top")
+            log.pack(side="right",padx=(10,0))
             
-            button=ttk.Button(window,text="attack",command=progress_round)
-            button.pack(side="top")
-
-        def quit():
-            self.main_menu()
+            
 
         location=self.locate_player()
         enemy:Enemy.Enemy=location.fight()
@@ -253,15 +281,54 @@ class PythonGame:
                 return None
             
         information_label=ttk.Label(text=f"{enemy.name} has appeared! do you want to fight it?")
-        information_label.grid(row=1,column=0,columnspan=4,pady=(10,0))
+        information_label.grid(row=1,column=0,columnspan=3,pady=(10,0))
         Yes_Button=ttk.Button(text="Yes",command=fight,width=10)
-        Yes_Button.grid(row=2,column=1,pady=10)
         No_Button=ttk.Button(text="No",command=quit,width=10)
-        No_Button.grid(row=2,column=2,pady=10)
+
+        Yes_Button.grid(row=2,column=0,columnspan=2,sticky="e",padx=(0,177),pady=10)
+        No_Button.grid(row=2,column=1,columnspan=2,sticky="w",padx=(177,0),pady=10)
+        # ttk.Button(text="inventory",command=self.open_inventory).grid(row=6,column=0,columnspan=2,sticky="e",padx=(0,177),pady=10)
+        # ttk.Button(text="save file",command=lambda:self.choose_save_file_window("save")).grid(row=6,column=1,columnspan=2,sticky="w",padx=(177,0),pady=10)
         
+    def open_inventory (self):
+        def use():
+            item_name=inventory.get(int(inventory.curselection()[0]))
+            item_name=item_name.split(" x")[0]
+            self.player.use_item(item_name)
+            self.create_user_stats()
+            inventory.delete(0,tk.END)
+            for item in self.player.Items.values():
+                inventory.insert(tk.END,f"{item["name"]} x{item["quantity"]}")
+        def item_info():
+            item_name=inventory.get(int(inventory.curselection()[0]))
+            item_name=item_name.split(" x")[0]
+            window=tk.Toplevel()
+            window.title("Item info")
+            window.resizable(width=0,height=0)
+            window.configure(background="#dcdad5")
+            for key, value in self.player.Items[item_name].items():
+                ttk.Label(window,text=f"{key}: {value}").pack(padx=10,pady=(0,10))
         
+        window=tk.Toplevel()
+        window.title("Inventory")
+        window.resizable(width=0,height=0)
+        window.configure(background="#dcdad5")
+        window.protocol("WM_DELETE_WINDOW",lambda:[window.destroy(),self.main_menu()])
         
-    def create_user_stats (self,master:tk.Tk):
+        inventory = tk.Listbox(window,height=5,width=40,background="#dcdad5",relief="sunken")
+        inventory.grid(row=2,column=1,pady=20)
+        
+
+        ttk.Button(window,text="close",command=self.main_menu).grid(row=3,column=0,pady=10,padx=(10,0),sticky="e")
+        ttk.Button(window,text="use",command=use).grid(row=3,column=1,pady=10)
+        ttk.Button(window,text="info",command=item_info).grid(row=3,column=2,pady=10,padx=(0,10),sticky="w")
+
+        for item in self.player.Items.values():
+            inventory.insert(tk.END,f"{item["name"]} x{item["quantity"]}")
+
+    def create_user_stats (self,master="none"):
+        if master=="none":
+            master=self.stats
         for widget in master.winfo_children():
             widget.destroy()
         ttk.Label(master,text=f"Name: {self.player.name}",width=16,font=('Blackadder ITC', 20,"bold")).pack(side="left",padx=10)
@@ -273,18 +340,29 @@ class PythonGame:
         ttk.Label(master,text=f"Location: {self.player.Location}").pack(side="left",padx=(0,10))
 
     def main_menu(self):
-        
+        def disable_buttons():
+            for widget in self.root.winfo_children():
+                if type(widget) == ttk.Button:
+                    widget.configure(state="disabled")
+                    
         self.clear_widgets_in_root()
-        self.root.geometry("720x600+300+100")
-        main_menu_frame=ttk.Labelframe(self.root,relief="raised",text="Stats")
-        main_menu_frame.grid(row=0,column=0,columnspan=10,padx=2,pady=2)
-        self.root.columnconfigure((0,1,2,3),weight=1)
-        self.create_user_stats(main_menu_frame)
-        self.player.Lvl=10
-        ttk.Button(text="Fight",command=lambda:self.fight(main_menu_frame),width=12).grid(row=5,column=0,padx=(33,0))
-        ttk.Button(text="Explore",command=self.explore,width=12).grid(row=5,column=1)
-        ttk.Button(text="Talk to NPC",command=self.talk,width=12).grid(row=5,column=2)
-        ttk.Button(text="save file",command=lambda:self.choose_save_file_window("save")).grid(row=5,column=3,padx=(0,33))
+        self.root.geometry("730x600+300+100")
+        
+        self.stats.grid(row=0,column=0,columnspan=10,padx=2,pady=2)
+        self.root.columnconfigure((0,1,2),weight=1)
+    
+        self.create_user_stats()
+
+        #disable buttons after choice
+
+        ttk.Separator(self.root, orient="horizontal").grid(row=4,column=0, columnspan=3, sticky="ew",padx=40)
+
+        ttk.Button(text="Fight",command=lambda:[disable_buttons(),self.fight()],width=12).grid(row=5,column=0,padx=(33,0),pady=(10,0))
+        ttk.Button(text="Explore",command=lambda:[disable_buttons(),self.explore()],width=12).grid(row=5,column=1,pady=(10,0))
+        ttk.Button(text="Talk to NPC",command=lambda:[disable_buttons(),self.talk()],width=12).grid(row=5,column=2,padx=(0,33),pady=(10,0))
+        ttk.Button(text="inventory",command=lambda:[disable_buttons(),self.open_inventory()]).grid(row=6,column=0,columnspan=2,sticky="e",padx=(0,177),pady=10)
+        ttk.Button(text="save file",command=lambda:[disable_buttons(),self.choose_save_file_window("save")]).grid(row=6,column=1,columnspan=2,sticky="w",padx=(177,0),pady=10)
+        
         # ttk.Label(main_menu_frame,text=f"LVL: {self.player.Lvl}").pack(side="left")
         # ttk.Label(main_menu_frame,text=f": {self.player.}").pack(side="left")
         
