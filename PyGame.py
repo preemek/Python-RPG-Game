@@ -265,8 +265,8 @@ class PythonGame:
             
             window=tk.Frame(self.root,background="#dcdad5")
             window.grid(row=2,column=0,columnspan=3,pady=20)
-            scroll = tk.Scrollbar(window, orient='vertical')
-            scroll.pack(side="right",padx=(0,10)) 
+            button=ttk.Button(window,text="attack",command=progress_round)
+            button.pack(side="bottom")
             log=tk.Listbox(window,height=5,width=40,background="#dcdad5",relief="sunken")
             log.pack(side="right",padx=(10,0))
             
