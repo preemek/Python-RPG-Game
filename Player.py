@@ -8,7 +8,7 @@ small_health_potion ={"type":"potion", "name":"small health potion","hp": 5}
 junk_item={"type":"weapon", "name":"nothing", "dmg": 0}
 
 class Player:
-    def __init__ (self,name="None",HP=10,MaxHP=10,Base_Dmg=2,Equiped_Weapon=junk_item,Items={},Lvl=0,EXP=0,EXP_needed_to_lvl_up=10,Gold=0,Location="village"):
+    def __init__ (self,name="None",HP=10,MaxHP=10,Base_Dmg=2,Equiped_Weapon=junk_item,Items={},Lvl=0,EXP=0,EXP_needed_to_lvl_up=10,Gold=0,Location="village",story_events:set={}):
         self.name=name
         self.HP=HP
         self.MaxHP=MaxHP
@@ -21,6 +21,7 @@ class Player:
         self.Items:dict = Items
         self.Gold=Gold
         self.Location:str = Location
+        self.story_events=story_events
     def take_dmg (self, dmg_taken): #jeżeli będą dodane zbroje, będzie to przydatne do obliczeń
         #dmg_taken = dmg_taken * max(1-self.DEF, 0.5) // ex. self.DEF = (0.2), armor negates 20% of dmg taken. If armor has negative value it will make player: Player take more dmg
         self.HP -= dmg_taken
@@ -100,6 +101,7 @@ class Player:
                 self.Items=player_data["Items"]
                 self.Gold=player_data["Gold"]
                 self.Location=player_data["Location"]
+                self.story_events=player_data["story_events"]
                 # ---
                 player_save.close
 

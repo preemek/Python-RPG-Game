@@ -6,6 +6,7 @@ from Location import location
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from Npc import NPC
 
 class PythonGame:
     def __init__(self,root:tk.Tk,locations=[village,forest,castle]):
@@ -47,6 +48,17 @@ class PythonGame:
     def game_over(self):
         self.root.destroy()
         messagebox.showinfo("Game over","you've been defeated, try again next time!")
+    
+    def turn_varibles_into_dict(self,list_of_varibles)->dict:
+        dict={}
+        for i in list_of_varibles:
+            try:
+                dict[i]=eval("{}".format(i))
+            except NameError:
+                raise Exception("Needed varible '{}' is not provided".format(i))
+            except Exception as e:
+                print(type(e),e)
+        return dict
 
     def choose_save_file_window(self,option:Literal["save","load"]):
         def button_on(number):
@@ -108,7 +120,7 @@ class PythonGame:
             if location.name == self.player.Location:
                 return location
             
-    def talk (self):
+    def talk (self): # choosing npc
         location=self.locate_player()
         window=tk.Frame(self.root)
         window.grid(row=2,column=0,columnspan=4,pady=(40,100))
@@ -118,69 +130,97 @@ class PythonGame:
             w:tk.Listbox = event.widget
             index = int(w.curselection()[0])
             npc=location.talk()
-            npc=npc[index]
+            npc:NPC=npc[index]
             window.destroy()
-            if npc["name"] != " Travel Person":
+            if npc.name != "Travel_Person":
                 self.normal_dialog(npc)
             else:
-                self.travel(npc)
+                self.player.Location=self.choose_location()
 
         listbox.bind('<<ListboxSelect>>', on_select)
         
         for npc in location.talk():
-            listbox.insert(tk.END, str(npc["name"]))
+            listbox.insert(tk.END, str(npc.name))
         listbox.grid(row=2,column=0)
 
-    def normal_dialog(self,npc):
-        dialog:list = npc["dialog"].splitlines()
-        text:str = dialog.pop(0)
-        dialog_label=ttk.Label(text=f"{text}")
+    def normal_dialog(self,npc:NPC):
+        dialog_label=ttk.Label(text="")
         dialog_label.grid(row=1,column=0,columnspan=4,pady=(10,0))
-        def next_dialog():
-            if len(dialog)==0:
-                self.main_menu()
+        
+        window=tk.Frame(self.root,background="#dcdad5")
+        window.grid(row=2,column=0,columnspan=4,pady=(40,100))
+
+        btt=ttk.Button(window,text="next",command=lambda:next_dialog(iterator.pop(0)))
+        btt.pack(side="bottom")
+
+        iterator=list(range(0,len(npc.dialog_list)))
+
+        def proces_information (text):
+            if text["reward"] is not None:
+                self.player.found_item(text["reward"])
+            if text["command"] is not None:
+                exec("{}".format(text["command"])) #just hope that npc doesnt accidentaly have some bad commands that will break programm
+            if text["add_event_to_story"]:
+                self.player.story_events.add(text["add_event_to_story"])
+            if text["is_last_dialog"]:
+                btt.configure(text="close",command=self.main_menu)
+            if text["dialog"] is None:
+                next_dialog(iterator.pop(0))
             else:
-                text=dialog.pop(0)
-                dialog_label.config(text=f"{text}")
+                dialog_label.config(text=f"{text["dialog"]}")
+
+        def next_dialog(iterator):
+
+            text=npc.talk(iterator,self.turn_varibles_into_dict(npc.get_needed_varibles()))
+            print(text)  # <----------here is a print
+            if text["is_question"]:
+                print("question {}".format(iterator)) # <----------here is a print
+                dialog_label.config(text=text["question"])
+                yes_btt=ttk.Button(window,text=text["yes_text"],command=lambda:answer(True),width=5)
+                yes_btt.pack(side="left",pady=5,padx=(0,20))
+                no_btt=ttk.Button(window,text=text["no_text"],command=lambda:answer(False),width=5)
+                no_btt.pack(side="right",pady=5)
+                btt.configure(state="disabled")
+
+                def answer(answer):
+                    yes_btt.destroy()
+                    no_btt.destroy()
+                    btt.configure(state="normal")
+                    print(npc.get_result_for_question(answer,text["dialog_varible"])) # <----------here is a print
+                    proces_information(npc.get_result_for_question(answer,text["dialog_varible"]))
+            else:
+                print("triggered proces info {}".format(iterator)) # <----------here is a print
+                proces_information(text)
+
+            if iterator==len(npc.dialog_list)-1:
+                btt.configure(text="close",command=self.main_menu)
+
+        next_dialog(iterator.pop(0)) #first dialog appears right after choosing npc
+
+    def choose_location(self):
+        new_location=tk.StringVar()
+        def on_select(event:tk.Event):
+            w:tk.Listbox = event.widget
+            index = int(w.curselection()[0])
+            new_location.set("{}".format(self.locations[index].name))
+
         window=tk.Frame(self.root)
         window.grid(row=2,column=0,columnspan=4,pady=(40,100))
-        ttk.Button(window,text="next",command=next_dialog).pack()
-
-    def travel(self,npc):
-        def quit():
-            self.main_menu()
-        def choose_location():
-            def on_select(event:tk.Event):
-                w:tk.Listbox = event.widget
-                index = int(w.curselection()[0])
-                self.player.Location="{}".format(self.locations[index].name)
-                self.main_menu()
-            
-            Yes_Button.destroy()
-            No_Button.destroy()
-
-            window=tk.Frame(self.root)
-            window.grid(row=2,column=0,columnspan=4,pady=(40,100))
-            
-            text=dialog.pop(0)
-            dialog_label.config(text=text)
-            listbox = tk.Listbox(window, height = 3,width=15, bg = "#c6c4bf", activestyle = 'dotbox', font = ('Gabriola', 16,"bold"),fg = "black")
-            listbox.pack()
-            listbox.bind('<<ListboxSelect>>', on_select)
-            
-            for location in self.locations:
-                listbox.insert(tk.END, str(location.name))
-            listbox.grid(row=2,column=0)
-
-        dialog:list[str]=npc["dialog"].splitlines()
-        text=dialog.pop(0)
-        dialog_label=ttk.Label(text=f"{text}")
-        dialog_label.grid(row=1,column=0,columnspan=4)
         
-        Yes_Button=ttk.Button(text="Yes",command=choose_location,width=10)
-        No_Button=ttk.Button(text="No",command=quit,width=10)
-        Yes_Button.grid(row=2,column=0,columnspan=2,sticky="e",padx=(0,177),pady=(10,50))
-        No_Button.grid(row=2,column=1,columnspan=2,sticky="w",padx=(177,0),pady=(10,50))
+        dialog_label=ttk.Label(text="choose location")
+        dialog_label.grid(row=1,column=0,columnspan=4)
+        listbox = tk.Listbox(window, height = 3,width=15, bg = "#c6c4bf", activestyle = 'dotbox', font = ('Gabriola', 16,"bold"),fg = "black")
+        listbox.pack()
+        listbox.bind('<<ListboxSelect>>', on_select)
+        
+        for location in self.locations:
+            listbox.insert(tk.END, str(location.name))
+        listbox.grid(row=2,column=0)
+
+        window.wait_variable(new_location) # might cause errors idk
+        window.destroy()
+        dialog_label.destroy()
+        return(new_location.get())
         
     def explore (self):
         def quit():
@@ -340,6 +380,7 @@ class PythonGame:
         ttk.Label(master,text=f"Location: {self.player.Location}").pack(side="left",padx=(0,10))
 
     def main_menu(self):
+        """clears all widgets in root, creates main menu"""
         def disable_buttons():
             for widget in self.root.winfo_children():
                 if type(widget) == ttk.Button:

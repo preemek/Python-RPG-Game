@@ -63,9 +63,14 @@ big_health_potion ={"type":"potion", "name":"Big health potion","hp": 10,"drop_c
 loot={"name":"loot","find_chance":1}
 wishing_well={"name":"wishing well","find_chance":3}
 
+"""
+not usefull
 Travel_Person ={"name":" Travel Person","dialog":"Hello adventuer, do you want to have a ride?\nWhere do you want to go?"}
 Bob = {"name":"Bob","dialog":"Hello adventuer, have you heard of princess trapped in the castle?\nBut its very scary there so prepare yourself before you go there\n"}
+"""
 
-forest = location("forest",[ork,wolf,cursed_tree],[gold_forest,small_health_potion,mace],[Travel_Person],[loot,wishing_well])
-village = location("village",["no enemies"],[gold_village,wooden_sword],[Travel_Person,Bob],[loot,wishing_well])
-castle = location("castle",[strong_ork,strong_wolf],[gold_castle],[Travel_Person],[loot])
+
+from Npc import bartek, kali
+forest = location("forest",[ork,wolf,cursed_tree],[gold_forest,small_health_potion,mace],[kali],[loot,wishing_well])
+village = location("village",["no enemies"],[gold_village,wooden_sword],[bartek,kali],[loot,wishing_well])
+castle = location("castle",[strong_ork,strong_wolf],[gold_castle],[kali],[loot])
