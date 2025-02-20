@@ -1,29 +1,20 @@
-import random
-
 class Player:
     def __init__(self):
-        self.name = "Gracz"
+        self.name = "Hero"
         self.hp = 100
+        self.level = 1
+        self.experience = 0
         self.inventory = []
-        self.attack_bonus = 0
-    
+        self.base_damage = (5, 10)
+        self.location = None
+
     def attack(self):
-        return random.randint(1, 10) + self.attack_bonus
-    
-    def take_damage(self, damage):
-        self.hp -= damage
-        if self.hp < 0:
-            self.hp = 0
+        import random
+        return random.randint(*self.base_damage)
 
-    def heal(self, amount):
-        self.hp += amount
-        if self.hp > 100:
-            self.hp = 100
-
-    
-    def use_item(self, item):
-        if item == "Health potion":
-            self.hp = min(self.hp + 20, 100)
-            self.inventory.remove(item)
-
-    
+    def use_health_potion(self):
+        if "Health Potion" in self.inventory:
+            self.inventory.remove("Health Potion")
+            self.hp += 20
+            return True
+        return False
