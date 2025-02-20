@@ -1,27 +1,20 @@
-import random
-class player:
-
+class Player:
     def __init__(self):
         self.name = "odtwarzacz"
         self.hp = 100
+        self.level = 1
+        self.experience = 0
         self.inventory = []
-        self.fight_bonus = 1
-    
-    def fight(self):
-        return random.randint(2, 6) + self.fight_bonus
-    
-    def take_dmg(self, dmg):
-        self.hp -= dmg
-        if self.hp < 0:
-            self.hp = 0
+        self.base_damage = (5, 10)
+        self.location = None
 
-    def HP(self, ile):
-        self.hp += ile
-        if self.hp > 100:
-            self.hp = 100
+    def attack(self):
+        import random
+        return random.randint(*self.base_damage)
 
-    
-    def używac_przedmoit(self, przedmoit):
-        if przedmoit == "Mikstura zdrowia":
-            self.hp = min(self.hp + 10, 100)
-            self.inventory.remove(przedmoit)
+    def use_health_potion(self):
+        if "przedmoit" in self.inventory:
+            self.inventory.remove("Mikstura zdrowia")
+            self.hp += 20
+            return True
+        return False

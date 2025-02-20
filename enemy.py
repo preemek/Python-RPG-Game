@@ -1,16 +1,13 @@
 import random
 
-
 class Enemy:
+    def __init__(self, name, hp, damage_range):
+        self.name = name
+        self.hp = hp
+        self.damage_range = damage_range
 
-
-    def __init__(self, nazwa, zdrowie, dmd_range):
-        self.nazwa = nazwa
-        self.zdrowie = zdrowie
-        self.dmd_range = dmd_range
-
-    def fight(self):
-        return random.randint(*self.dmd_range)
+    def attack(self):
+        return random.randint(*self.damage_range)
 
 enemies = [
     Enemy("Bałwan", 50, (2, 8)),
