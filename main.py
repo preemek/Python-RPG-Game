@@ -55,12 +55,16 @@ class Game:
         for location in locations.values():
             tk.Button(self.root, text=location.name, font=("Arial", 14), command=lambda loc=location: self.enter_location(loc)).pack(pady=5)
 
+        self.status_label = tk.Label(self.root, text = "", font=("Arial", 12))
+        self.status_label.pack(pady=10)
+
         self.update_status()
 
     def enter_location(self, location):
         player.location = location
         for widget in self.root.winfo_children():
             widget.destroy()
+
 
         tk.Label(self.root, text=f"{location.name}", font=("Arial", 16)).pack(pady=10)
         tk.Label(self.root, text=location.description, font=("Arial", 12)).pack(pady=10)
@@ -117,6 +121,10 @@ class Game:
                 return
         elif event == "merchant":
             messagebox.showinfo("Merchant", "You met a traveling merchant but had no gold to trade.")
+
+        self.status_label = tk.Label(self.root, text = "", font=("Arial", 12))
+        self.status_label.pack(pady=10)
+        
         self.update_status()
 
     def talk(self, location):
