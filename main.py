@@ -29,8 +29,10 @@ class Game:
 
         self.status_label = tk.Label(self.root, text="", font=("Arial", 12))
         self.status_label.pack(pady=10)
+    
 
     def update_status(self):
+        
         self.status_label.config(text=f"{player.name}\nHP: {player.hp}\nLevel: {player.level}\nXP: {player.experience}\nLocation: {player.location.name if player.location else 'None'}\nInventory: {', '.join(player.inventory) if player.inventory else 'Empty'}")
 
     def start_game(self):
