@@ -1,13 +1,14 @@
 from Enemy import ork, strong_ork, wolf, strong_wolf, cursed_tree
 from Enemy import Enemy
 import random
+from Npc import NPC
 
 class location:
     def __init__(self, name, list_of_enemies, list_of_loot, list_of_NPC,list_of_events):
         self.name=name
         self.list_of_enemies=list_of_enemies #enemies that may appear in battle in that location
         self.list_of_loot=list_of_loot #during exploration you can find loot (każdy item musi mieć swoją szansę na wylosowanie)
-        self.list_of_NPC=list_of_NPC #NPC that you can talk to
+        self.list_of_NPC:list[NPC]=list_of_NPC #NPC that you can talk to
         self.list_of_events=list_of_events
 
     def fight (self) -> Enemy: #wybierz przeciwnika z listy
@@ -60,8 +61,8 @@ gold_castle = {"type":"gold","name":"gold","min_amount":10,"max_amount":15,"drop
 small_health_potion ={"type":"potion", "name":"Small health potion","hp": 5,"drop_chance":5}
 big_health_potion ={"type":"potion", "name":"Big health potion","hp": 10,"drop_chance":5}
 
-loot={"name":"loot","find_chance":1}
-wishing_well={"name":"wishing well","find_chance":3}
+loot={"name":"loot","find_chance":4}
+wishing_well={"name":"wishing well","find_chance":1}
 
 """
 not usefull
@@ -70,7 +71,8 @@ Bob = {"name":"Bob","dialog":"Hello adventuer, have you heard of princess trappe
 """
 
 
-from Npc import bartek, kali
-forest = location("forest",[ork,wolf,cursed_tree],[gold_forest,small_health_potion,mace],[kali],[loot,wishing_well])
-village = location("village",["no enemies"],[gold_village,wooden_sword],[bartek,kali],[loot,wishing_well])
-castle = location("castle",[strong_ork,strong_wolf],[gold_castle],[kali],[loot])
+from Npc import Bartek, Healer, Travel_Person, Witch, Palladin, Mysterious_Man
+
+forest = location("forest",[ork,wolf,cursed_tree],[gold_forest,small_health_potion,mace],[Travel_Person,Witch],[loot,wishing_well])
+village = location("village",["no enemies"],[gold_village,wooden_sword],[Travel_Person,Healer,Bartek,Mysterious_Man],[loot,wishing_well])
+castle = location("castle",[strong_ork,strong_wolf],[gold_castle],[Travel_Person,Palladin],[loot])

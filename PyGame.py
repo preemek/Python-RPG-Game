@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from Npc import NPC
+from Npc import Palladin, Witch
 
 class PythonGame:
     def __init__(self,root:tk.Tk,locations=[village,forest,castle]):
@@ -48,14 +49,23 @@ class PythonGame:
     def game_over(self):
         self.root.destroy()
         messagebox.showinfo("Game over","you've been defeated, try again next time!")
+
+    def Witch_ending (self):
+        self.root.destroy()
+        messagebox.showinfo("Game over","And... As a follower of that Mysterious Witch, you'll follow her and embark on a new journey")
     
-    def turn_varibles_into_dict(self,list_of_varibles)->dict:
+    def Palladin_ending (self):
+        self.root.destroy()
+        messagebox.showinfo("Game over","And... As a follower of a great knight, you'll follow him and follow his path")
+
+    def turn_varibles_into_dict(self,list_of_varibles:list[str])->dict:
         dict={}
-        for i in list_of_varibles:
+        for varible in list_of_varibles:
             try:
-                dict[i]=eval("{}".format(i))
+                varible_modified=varible.replace(".","")
+                dict[varible_modified]=eval("{}".format(varible))
             except NameError:
-                raise Exception("Needed varible '{}' is not provided".format(i))
+                raise Exception("Needed varible '{}' is not provided".format(varible))
             except Exception as e:
                 print(type(e),e)
         return dict
@@ -74,6 +84,7 @@ class PythonGame:
                     messagebox.showerror(title="File not found!",message=f"file {number} doesn't exist")
             if option=="save":
                 self.player.save_player_data(file_number=number)
+                self.main_menu()
                 window.destroy()
 
         window=tk.Toplevel(self.root)
@@ -144,6 +155,53 @@ class PythonGame:
         listbox.grid(row=2,column=0)
 
     def normal_dialog(self,npc:NPC):
+        def proces_information (text):
+            print(text) # <----------here is a print
+            if text["dialog"] is not None:
+                dialog_label.config(text=f"{text["dialog"]}")
+            if text["reward"] is not None:
+                self.player.found_item(text["reward"])
+            if text["command"] is not None:
+                exec("{}".format(text["command"])) #just hope that npc doesnt accidentaly have some bad commands that will break programm
+            if text["add_event_to_story"]:
+                self.player.story_events.add(text["add_event_to_story"])
+            if text["is_last_dialog"]:
+                btt.configure(text="close",command=self.main_menu)
+            if text["dialog"] is None and not text["is_last_dialog"]:
+                if len(iterator)==0:
+                    btt.configure(text="close",command=self.main_menu)
+                else:
+                    print("automatic next dialog") # <---- her is a print
+                    next_dialog(iterator.pop(0))
+            
+ 
+        def next_dialog(iterator):
+            print(iterator)
+            text=npc.talk(iterator,self.turn_varibles_into_dict(npc.get_needed_varibles()))
+            if text["is_question"]:
+                def answer(answer):
+                    yes_btt.destroy()
+                    no_btt.destroy()
+                    btt.configure(state="normal")
+                    proces_information(npc.get_result_for_question(answer,text["dialog_varible"]))
+
+                # print("question {}".format(iterator)) # <----------here is a print
+                dialog_label.config(text=text["question"])
+                yes_btt=ttk.Button(window,text=text["yes_text"],command=lambda:answer(True),width=5)
+                yes_btt.pack(side="left",pady=5,padx=(0,20))
+                no_btt=ttk.Button(window,text=text["no_text"],command=lambda:answer(False),width=5)
+                no_btt.pack(side="right",pady=5)
+                btt.configure(state="disabled")
+
+            else:
+                # print("triggered proces info {}".format(iterator)) # <----------here is a print
+                proces_information(text)
+
+            if iterator==len(npc.dialog_list)-1:
+                print("closing dialog")
+                btt.configure(text="close",command=self.main_menu)
+
+
         dialog_label=ttk.Label(text="")
         dialog_label.grid(row=1,column=0,columnspan=4,pady=(10,0))
         
@@ -154,47 +212,7 @@ class PythonGame:
         btt.pack(side="bottom")
 
         iterator=list(range(0,len(npc.dialog_list)))
-
-        def proces_information (text):
-            if text["reward"] is not None:
-                self.player.found_item(text["reward"])
-            if text["command"] is not None:
-                exec("{}".format(text["command"])) #just hope that npc doesnt accidentaly have some bad commands that will break programm
-            if text["add_event_to_story"]:
-                self.player.story_events.add(text["add_event_to_story"])
-            if text["is_last_dialog"]:
-                btt.configure(text="close",command=self.main_menu)
-            if text["dialog"] is None:
-                next_dialog(iterator.pop(0))
-            else:
-                dialog_label.config(text=f"{text["dialog"]}")
-
-        def next_dialog(iterator):
-
-            text=npc.talk(iterator,self.turn_varibles_into_dict(npc.get_needed_varibles()))
-            print(text)  # <----------here is a print
-            if text["is_question"]:
-                print("question {}".format(iterator)) # <----------here is a print
-                dialog_label.config(text=text["question"])
-                yes_btt=ttk.Button(window,text=text["yes_text"],command=lambda:answer(True),width=5)
-                yes_btt.pack(side="left",pady=5,padx=(0,20))
-                no_btt=ttk.Button(window,text=text["no_text"],command=lambda:answer(False),width=5)
-                no_btt.pack(side="right",pady=5)
-                btt.configure(state="disabled")
-
-                def answer(answer):
-                    yes_btt.destroy()
-                    no_btt.destroy()
-                    btt.configure(state="normal")
-                    print(npc.get_result_for_question(answer,text["dialog_varible"])) # <----------here is a print
-                    proces_information(npc.get_result_for_question(answer,text["dialog_varible"]))
-            else:
-                print("triggered proces info {}".format(iterator)) # <----------here is a print
-                proces_information(text)
-
-            if iterator==len(npc.dialog_list)-1:
-                btt.configure(text="close",command=self.main_menu)
-
+        print(iterator)
         next_dialog(iterator.pop(0)) #first dialog appears right after choosing npc
 
     def choose_location(self):
@@ -337,6 +355,7 @@ class PythonGame:
             self.player.use_item(item_name)
             self.create_user_stats()
             inventory.delete(0,tk.END)
+            inventory.insert(tk.END,f"Gold x{self.player.Gold}")
             for item in self.player.Items.values():
                 inventory.insert(tk.END,f"{item["name"]} x{item["quantity"]}")
         def item_info():
@@ -346,9 +365,12 @@ class PythonGame:
             window.title("Item info")
             window.resizable(width=0,height=0)
             window.configure(background="#dcdad5")
-            for key, value in self.player.Items[item_name].items():
-                ttk.Label(window,text=f"{key}: {value}").pack(padx=10,pady=(0,10))
-        
+            try:
+                for key, value in self.player.Items[item_name].items():
+                    ttk.Label(window,text=f"{key}: {value}").pack(padx=10,pady=(0,10))
+            except Exception as err:
+                print(err)
+
         window=tk.Toplevel()
         window.title("Inventory")
         window.resizable(width=0,height=0)
@@ -362,10 +384,11 @@ class PythonGame:
         ttk.Button(window,text="close",command=self.main_menu).grid(row=3,column=0,pady=10,padx=(10,0),sticky="e")
         ttk.Button(window,text="use",command=use).grid(row=3,column=1,pady=10)
         ttk.Button(window,text="info",command=item_info).grid(row=3,column=2,pady=10,padx=(0,10),sticky="w")
-
+        
+        inventory.insert(tk.END,f"Gold x{self.player.Gold}")
         for item in self.player.Items.values():
             inventory.insert(tk.END,f"{item["name"]} x{item["quantity"]}")
-
+        
     def create_user_stats (self,master="none"):
         if master=="none":
             master=self.stats
@@ -395,7 +418,7 @@ class PythonGame:
         self.create_user_stats()
 
         #disable buttons after choice
-
+   
         ttk.Separator(self.root, orient="horizontal").grid(row=4,column=0, columnspan=3, sticky="ew",padx=40)
 
         ttk.Button(text="Fight",command=lambda:[disable_buttons(),self.fight()],width=12).grid(row=5,column=0,padx=(33,0),pady=(10,0))

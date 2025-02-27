@@ -8,7 +8,7 @@ small_health_potion ={"type":"potion", "name":"small health potion","hp": 5}
 junk_item={"type":"weapon", "name":"nothing", "dmg": 0}
 
 class Player:
-    def __init__ (self,name="None",HP=10,MaxHP=10,Base_Dmg=2,Equiped_Weapon=junk_item,Items={},Lvl=0,EXP=0,EXP_needed_to_lvl_up=10,Gold=0,Location="village",story_events:set={}):
+    def __init__ (self,name="None",HP=10,MaxHP=10,Base_Dmg=2,Equiped_Weapon=junk_item,Items={},Lvl=0,EXP=0,EXP_needed_to_lvl_up=10,Gold=0,Location="village",story_events=[]):
         self.name=name
         self.HP=HP
         self.MaxHP=MaxHP
@@ -21,7 +21,7 @@ class Player:
         self.Items:dict = Items
         self.Gold=Gold
         self.Location:str = Location
-        self.story_events=story_events
+        self.story_events:set=set(story_events)
     def take_dmg (self, dmg_taken): #jeżeli będą dodane zbroje, będzie to przydatne do obliczeń
         #dmg_taken = dmg_taken * max(1-self.DEF, 0.5) // ex. self.DEF = (0.2), armor negates 20% of dmg taken. If armor has negative value it will make player: Player take more dmg
         self.HP -= dmg_taken
@@ -39,6 +39,8 @@ class Player:
         if self.EXP >= self.EXP_needed_to_lvl_up:
             self.EXP -= self.EXP_needed_to_lvl_up
             self.Lvl+=1
+            self.MaxHP+=2
+            self.HP+=2
             self.EXP_needed_to_lvl_up *= 1.2
             int(self.EXP_needed_to_lvl_up)
             
@@ -101,10 +103,9 @@ class Player:
                 self.Items=player_data["Items"]
                 self.Gold=player_data["Gold"]
                 self.Location=player_data["Location"]
-                self.story_events=player_data["story_events"]
+                self.story_events=set(player_data["story_events"])
                 # ---
-                player_save.close
-
+                player_save.close()
 
         elif mode == "new_player":
             name=input_name
@@ -114,7 +115,9 @@ class Player:
         path=f"Python-RPG-Game/Player_Save_File{file_number}.json"
         try:
             with open(path,'w') as save_file:
+                self.story_events=list(self.story_events)
                 json.dump(self.__dict__,save_file)
                 save_file.close
         except Exception as err:
             print(err)
+
